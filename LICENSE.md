@@ -1,6 +1,10 @@
+# License
+
+## Code (MIT License)
+
 MIT License
 
-Copyright (c) 2026 Harry Nguyen, Tran Anh Thu Phung, May Eindra Tet Toe, Anastasia Tountas
+Copyright (c) 2026 Group 17
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +23,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+## Report / documentation (CC BY-NC-ND 4.0)
+
+The written report and documentation in this repository are licensed under the
+Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
+
+License details: https://creativecommons.org/licenses/by-nc-nd/4.0/
