@@ -3,7 +3,7 @@
 We welcome all contributions to this project!
 
 If you notice a bug or have a feature request, please open an issue here:
-https://github.com/UBC-DSCI-310-2025W2/dsci-310-group-17/issues
+[here](https://github.com/UBC-DSCI-310-2025W2/dsci-310-group-17/issues)
 
 If you'd like to contribute a feature or bug fix:
 1. Fork the repo (or create a branch if you are a collaborator)
