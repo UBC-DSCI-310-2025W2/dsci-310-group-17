@@ -118,6 +118,64 @@ billboard_clean <- billboard_joined |>
   # Convert remaining character columns to factors
   mutate(across(where(is.character), as.factor)) |>
   drop_na()
-
-glimpse(billboard_clean)
 ```
+
+#### Exploratory Data Analysis
+
+We first examine the distribution of our target variable,
+`weeks_at_number_one`, to check for skewness.
+
+```{r eda-target-dist}
+ggplot(billboard_clean, aes(x = weeks_at_number_one)) +
+  geom_histogram(binwidth = 1, fill = "steelblue", colour = "white") +
+  labs(
+    title = "Distribution of Weeks at Number One",
+    x = "Weeks at Number One",
+    y = "Count"
+  ) +
+  theme_minimal()
+```
+
+Next, we examine the distributions of the five Spotify audio features, to
+identify any skewness that may require transformation before modelling.
+
+```{r eda-numeric-distributions}
+billboard_clean |>
+  select(bpm, energy, danceability, happiness, acousticness) |>
+  pivot_longer(
+    cols = everything(),
+    names_to = "feature",
+    values_to = "value"
+  ) |>
+  ggplot(aes(x = value)) +
+  geom_histogram(fill = "steelblue", colour = "white", bins = 30) +
+  facet_wrap(~feature, scales = "free") +
+  labs(
+    title = "Distributions of Spotify Audio Features",
+    x = "Value",
+    y = "Count"
+  ) +
+  theme_minimal()
+```
+
+Finally, we compare average `weeks_at_number_one` by genre to see whether
+certain genres are associated with longer chart runs.
+
+```{r eda-genre}
+billboard_clean |>
+  group_by(cdr_genre) |>
+  summarise(mean_weeks = mean(weeks_at_number_one), .groups = "drop") |>
+  ggplot(aes(
+    x = reorder(cdr_genre, mean_weeks),
+    y = mean_weeks
+  )) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Average Weeks at Number One by Genre",
+    x = "Genre",
+    y = "Average Weeks at Number One"
+  ) +
+  theme_minimal()
+```
+
