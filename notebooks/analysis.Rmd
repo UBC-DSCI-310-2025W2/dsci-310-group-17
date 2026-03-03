@@ -1,0 +1,123 @@
+---
+title: "Predicting Billboard #1 Hits"
+output: pdf_document
+date: "Authors: May Eindra Tet Toe, Anastasia Tountas, Tran Anh Thu Phung, Harry Nguyen"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Summary
+Insert a summary of your analysis here.
+
+### Introduction
+Insert an introduction to your analysis here.
+
+### Methods and Results
+
+#### Overview of our Methodology
+The Billboard Hot 100 dataset provides us with two datasets: `billboard.csv`, 
+which contains one row per song that reached #1 along with it's features, and `topics.csv`,
+a reference list of lyrical theme labels (`lyrical_topics`). Our team decided to 
+combine the two datasets to `billboard_clean` in order to create more comprehensive data 
+to better equip our model. Here is an overview of our data analysis methodology:
+
+1. **Reading & Wrangling:** read and wrangle the dataset into one tidy combined dataset
+
+2. **Exploratory Data Analysis:** explore the data to understand the distribution of features and their relationships with the target variable
+
+3. **Model Building:** build a regression model to predict the number of weeks a song stays at #1 based on its features
+
+4. **Model Evaluation:** evaluate the performance of our model using appropriate metrics and validation techniques
+
+5. **Results and Conclusion:** summarize our findings, discuss the implications of our results, and suggest potential future work or improvements to our analysis
+
+#### Load libraries and set seed
+```{r load-libraries}
+library(tidyverse)
+library(tidytuesdayR)
+library(knitr)
+library(dplyr)
+```
+```{r set-seed}
+set.seed(123)
+```
+#### Reading & Wrangling our dataset from the web into R
+
+- The two datasets were joined using a `left_join()` on `lyrical_topic` (billboard) 
+  and `lyrical_topics`(topics).
+- **Identifier columns** (`song`, `artist`, `date`) were removed as they are
+  not predictive features.
+- **`non_consecutive`** was removed to prevent data leakage — it can only
+  be determined after a song has completed its full chart run.
+- **`rating_1`, `rating_2`, `rating_3`** were removed in favour of
+  `overall_rating` (their mean) to avoid multicollinearity.
+- **Free-text columns** were removed avoid the high dimensionality 
+  and noise associated with Natural Language Processing:
+ `lyrics`, `u_s_artwork`, `sound_effects`, `song_structure`,
+  `featured_artists`, `songwriters`,
+  `songwriters_w_o_interpolation_sample_credits`, `producers`,
+  `double_a_side`, and `talent_contestant`.
+- **High-cardinality columns** removed because they generalise poorly:
+  `label`, `parent_label`, and `artist_place_of_origin`.
+- **Redundant columns** were removed: `keys` is replaced by `simplified_key`;
+  `cdr_style` and `discogs_style` are replaced by `cdr_genre` and `discogs_genre` respectively.
+- **`discogs_genre`** was removed in favour of `cdr_genre` because cdr has more reliable 
+  class definitions, thus improving internal validity.
+- **Ambiguous columns** were removed: `featured_in_a_then_contemporary_play`,
+  `featured_in_a_then_contemporary_film`, and
+  `featured_in_a_then_contemporary_t_v_show`.
+- All remaining character columns were converted to factors using
+  `as.factor()`, and rows with any missing values were dropped with
+  `drop_na()`.
+
+```{r load-data}
+# Load the TidyTuesday data for the week of August 26, 2025
+tuesdata <- tidytuesdayR::tt_load(2025, week = 34)
+# Extract the datasets
+billboard <- tuesdata$billboard
+topics <- tuesdata$topics
+```
+```{r join-data}
+# Join billboard with the topics reference list on lyrical topic category
+billboard_joined <- billboard |>
+  left_join(topics, by = c("lyrical_topic" = "lyrical_topics"))
+```
+```{r wrangle-data}
+billboard_clean <- billboard_joined |>
+  # Remove identifier columns
+  select(-c(song, artist, date)) |>
+  # Remove data-leakage column
+  select(-non_consecutive) |>
+  # Remove individual judge scores to avoid multicollinearity
+  select(-c(rating_1, rating_2, rating_3)) |>
+  # Remove free-text columns
+  select(-c(
+    lyrics,
+    u_s_artwork,
+    sound_effects,
+    song_structure,
+    featured_artists,
+    songwriters,
+    songwriters_w_o_interpolation_sample_credits,
+    producers,
+    double_a_side,
+    talent_contestant
+  )) |>
+  # Remove high-cardinality columns
+  select(-c(label, parent_label, artist_place_of_origin)) |>
+  # Remove redundant columns and discogs_genre
+  select(-c(cdr_style, discogs_style, keys, discogs_genre)) |>
+  # Remove ambiguous columns
+  select(-c(
+    featured_in_a_then_contemporary_play,
+    featured_in_a_then_contemporary_film,
+    featured_in_a_then_contemporary_t_v_show
+  )) |>
+  # Convert remaining character columns to factors
+  mutate(across(where(is.character), as.factor)) |>
+  drop_na()
+
+glimpse(billboard_clean)
+```
