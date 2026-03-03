@@ -8,15 +8,15 @@ date: "Authors: May Eindra Tet Toe, Anastasia Tountas, Tran Anh Thu Phung, Harry
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### Summary
+## Summary
 Insert a summary of your analysis here.
 
-### Introduction
+## Introduction
 Insert an introduction to your analysis here.
 
-### Methods and Results
+## Methods and Results
 
-#### Overview of our Methodology
+### Overview of our Methodology
 The Billboard Hot 100 dataset provides us with two datasets: `billboard.csv`, 
 which contains one row per song that reached #1 along with it's features, and `topics.csv`,
 a reference list of lyrical theme labels (`lyrical_topics`). Our team decided to 
@@ -33,7 +33,7 @@ to better equip our model. Here is an overview of our data analysis methodology:
 
 5. **Results and Conclusion:** summarize our findings, discuss the implications of our results, and suggest potential future work or improvements to our analysis
 
-#### Load libraries and set seed
+### Load libraries and set seed
 ```{r load-libraries}
 library(tidyverse)
 library(tidytuesdayR)
@@ -43,7 +43,7 @@ library(dplyr)
 ```{r set-seed}
 set.seed(123)
 ```
-#### Reading & Wrangling our dataset from the web into R
+### Reading & Wrangling our dataset from the web into R
 
 - The two datasets were joined using a `left_join()` on `lyrical_topic` (billboard) 
   and `lyrical_topics`(topics).
@@ -73,14 +73,14 @@ set.seed(123)
   `drop_na()`.
 
 ```{r load-data}
-# Load the TidyTuesday data for the week of August 26, 2025
+# Load the dataset
 tuesdata <- tidytuesdayR::tt_load(2025, week = 34)
 # Extract the datasets
 billboard <- tuesdata$billboard
 topics <- tuesdata$topics
 ```
 ```{r join-data}
-# Join billboard with the topics reference list on lyrical topic category
+# Join the two datasets
 billboard_joined <- billboard |>
   left_join(topics, by = c("lyrical_topic" = "lyrical_topics"))
 ```
@@ -120,8 +120,7 @@ billboard_clean <- billboard_joined |>
   drop_na()
 ```
 
-#### Exploratory Data Analysis
-
+### Exploratory Data Analysis
 We first examine the distribution of our target variable,
 `weeks_at_number_one`, to check for skewness.
 
@@ -135,6 +134,10 @@ ggplot(billboard_clean, aes(x = weeks_at_number_one)) +
   ) +
   theme_minimal()
 ```
+
+The distribution is heavily right-skewed. The majority of songs spent only
+1–3 weeks at #1, with counts dropping off sharply afterwards. A small
+number of songs stayed for 10 or more weeks, forming a long right tail.
 
 Next, we examine the distributions of the five Spotify audio features, to
 identify any skewness that may require transformation before modelling.
@@ -158,6 +161,11 @@ billboard_clean |>
   theme_minimal()
 ```
 
+`acousticness` is heavily right-skewed, with most songs clustered near
+zero. `happiness` shows a bimodal pattern with peaks around 30 and around 80.
+`energy` is very slightly left-skewed, while `bpm` and `danceability` 
+are roughly normal.
+
 Finally, we compare average `weeks_at_number_one` by genre to see whether
 certain genres are associated with longer chart runs.
 
@@ -179,3 +187,19 @@ billboard_clean |>
   theme_minimal()
 ```
 
+Electronic/Dance;Latin seems to have the highest average (~10 weeks).
+Pop;Reggae and Folk/Country;March also rank highly. Mainstream genres 
+like Pop and Rock sit in the middle of the range. At the lower end, we
+can find niche genres like Electronic/Dance;Funk/Soul, averaging to 1 week.
+
+### Feature Transformations
+
+Based on the Exploratory Data Analysis, three variables require transformation before modelling:
+
+- **`weeks_at_number_one`** is heavily right-skewed
+- **`acousticness`** is also heavily right-skewed
+- **`happiness`** is mildly left-skewed
+
+Therefore, we apply log transformation to these three variables to compresses the tail and produce
+a more symmetric target distribution. We will be using `log1p()` instead of `log()` to handle any 
+zero values in the data.
