@@ -121,10 +121,36 @@ billboard_clean <- billboard_joined |>
 ```
 
 ### Exploratory Data Analysis
-We first examine the distribution of our target variable,
+
+First, we find the summary statistics for our target variable, `weeks_at_number_one`, 
+and our key numeric predictors: `overall_rating`, `bpm`, `energy`, `danceability`, 
+`happiness`, `acousticness`, `loudness_d_b`, `front_person_age`, and `length_sec`.
+
+```{r eda-summary, echo = FALSE}
+billboard_clean |>
+  select(
+    weeks_at_number_one, overall_rating, bpm,
+    energy, danceability, happiness,
+    acousticness, loudness_d_b, front_person_age, length_sec
+  ) |>
+  pivot_longer(cols = everything(), names_to = "Variable") |>
+  group_by(Variable) |>
+  summarise(
+    Mean   = round(mean(value), 2),
+    SD     = round(sd(value), 2),
+    Min    = round(min(value), 2),
+    Median = round(median(value), 2),
+    Max    = round(max(value), 2),
+    .groups = "drop"
+  ) |>
+  kable(caption = "Summary statistics")
+```
+
+
+Then, we examine the distribution of our target variable,
 `weeks_at_number_one`, to check for skewness.
 
-```{r eda-target-dist, fig.cap="Distribution of weeks at number one."}
+```{r eda-target-dist, fig.cap="Distribution of weeks at number one.", echo = FALSE}
 ggplot(billboard_clean, aes(x = weeks_at_number_one)) +
   geom_histogram(binwidth = 1, fill = "steelblue", colour = "white") +
   labs(
@@ -136,13 +162,13 @@ ggplot(billboard_clean, aes(x = weeks_at_number_one)) +
 ```
 
 The distribution is heavily right-skewed. The majority of songs spent only
-1–3 weeks at #1, with counts dropping off sharply afterwards. A small
+1 to 3 weeks at #1, with counts dropping off sharply afterwards. A small
 number of songs stayed for 10 or more weeks, forming a long right tail.
 
 Next, we examine the distributions of the five Spotify audio features, to
 identify any skewness that may require transformation before modelling.
 
-```{r eda-numeric-distributions, fig.cap="Distributions of the five Spotify audio features."}
+```{r eda-numeric-distributions, fig.cap="Distributions of the five Spotify audio features.", echo = FALSE}
 billboard_clean |>
   select(bpm, energy, danceability, happiness, acousticness) |>
   pivot_longer(
@@ -169,7 +195,7 @@ are roughly normal.
 Finally, we compare average `weeks_at_number_one` by genre to see whether
 certain genres are associated with longer chart runs.
 
-```{r eda-genre, fig.cap="Average weeks at number one by genre."}
+```{r eda-genre, fig.cap="Average weeks at number one by genre.", echo = FALSE}
 billboard_clean |>
   group_by(cdr_genre) |>
   summarise(mean_weeks = mean(weeks_at_number_one), .groups = "drop") |>
