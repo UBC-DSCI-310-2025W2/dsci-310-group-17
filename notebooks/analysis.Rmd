@@ -9,68 +9,56 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Summary
+
 Insert a summary of your analysis here.
 
 ## Introduction
+
 Insert an introduction to your analysis here.
 
 ## Methods and Results
 
 ### Overview of our Methodology
-The Billboard Hot 100 dataset provides us with two datasets: `billboard.csv`, 
-which contains one row per song that reached #1 along with it's features, and `topics.csv`,
-a reference list of lyrical theme labels (`lyrical_topics`). Our team decided to 
-combine the two datasets to `billboard_clean` in order to create more comprehensive data 
-to better equip our model. Here is an overview of our data analysis methodology:
 
-1. **Reading & Wrangling:** read and wrangle the dataset into one tidy combined dataset
+The Billboard Hot 100 dataset provides us with two datasets: `billboard.csv`, which contains one row per song that reached #1 along with it's features, and `topics.csv`, a reference list of lyrical theme labels (`lyrical_topics`). Our team decided to combine the two datasets to `billboard_clean` in order to create more comprehensive data to better equip our model. Here is an overview of our data analysis methodology:
 
-2. **Exploratory Data Analysis:** explore the data to understand the distribution of features and their relationships with the target variable
+1.  **Reading & Wrangling:** read and wrangle the dataset into one tidy combined dataset
 
-3. **Model Building:** build a regression model to predict the number of weeks a song stays at #1 based on its features
+2.  **Exploratory Data Analysis:** explore the data to understand the distribution of features and their relationships with the target variable
 
-4. **Model Evaluation:** evaluate the performance of our model using appropriate metrics and validation techniques
+3.  **Model Building:** build a regression model to predict the number of weeks a song stays at #1 based on its features
 
-5. **Results and Conclusion:** summarize our findings, discuss the implications of our results, and suggest potential future work or improvements to our analysis
+4.  **Model Evaluation:** evaluate the performance of our model using appropriate metrics and validation techniques
+
+5.  **Results and Conclusion:** summarize our findings, discuss the implications of our results, and suggest potential future work or improvements to our analysis
 
 ### Load libraries and set seed
+
 ```{r load-libraries}
 library(tidyverse)
 library(tidytuesdayR)
 library(knitr)
 library(dplyr)
+library(caret)
+library(tidymodels)
 ```
+
 ```{r set-seed}
 set.seed(123)
 ```
+
 ### Reading & Wrangling our dataset from the web into R
 
-- The two datasets were joined using a `left_join()` on `lyrical_topic` (billboard) 
-  and `lyrical_topics`(topics).
-- **Identifier columns** (`song`, `artist`, `date`) were removed as they are
-  not predictive features.
-- **`non_consecutive`** was removed to prevent data leakage — it can only
-  be determined after a song has completed its full chart run.
-- **`rating_1`, `rating_2`, `rating_3`** were removed in favour of
-  `overall_rating` (their mean) to avoid multicollinearity.
-- **Free-text columns** were removed avoid the high dimensionality 
-  and noise associated with Natural Language Processing:
- `lyrics`, `u_s_artwork`, `sound_effects`, `song_structure`,
-  `featured_artists`, `songwriters`,
-  `songwriters_w_o_interpolation_sample_credits`, `producers`,
-  `double_a_side`, and `talent_contestant`.
-- **High-cardinality columns** removed because they generalise poorly:
-  `label`, `parent_label`, and `artist_place_of_origin`.
-- **Redundant columns** were removed: `keys` is replaced by `simplified_key`;
-  `cdr_style` and `discogs_style` are replaced by `cdr_genre` and `discogs_genre` respectively.
-- **`discogs_genre`** was removed in favour of `cdr_genre` because cdr has more reliable 
-  class definitions, thus improving internal validity.
-- **Ambiguous columns** were removed: `featured_in_a_then_contemporary_play`,
-  `featured_in_a_then_contemporary_film`, and
-  `featured_in_a_then_contemporary_t_v_show`.
-- All remaining character columns were converted to factors using
-  `as.factor()`, and rows with any missing values were dropped with
-  `drop_na()`.
+-   The two datasets were joined using a `left_join()` on `lyrical_topic` (billboard) and `lyrical_topics`(topics).
+-   **Identifier columns** (`song`, `artist`, `date`) were removed as they are not predictive features.
+-   **`non_consecutive`** was removed to prevent data leakage — it can only be determined after a song has completed its full chart run.
+-   **`rating_1`, `rating_2`, `rating_3`** were removed in favour of `overall_rating` (their mean) to avoid multicollinearity.
+-   **Free-text columns** were removed avoid the high dimensionality and noise associated with Natural Language Processing: `lyrics`, `u_s_artwork`, `sound_effects`, `song_structure`, `featured_artists`, `songwriters`, `songwriters_w_o_interpolation_sample_credits`, `producers`, `double_a_side`, and `talent_contestant`.
+-   **High-cardinality columns** removed because they generalise poorly: `label`, `parent_label`, and `artist_place_of_origin`.
+-   **Redundant columns** were removed: `keys` is replaced by `simplified_key`; `cdr_style` and `discogs_style` are replaced by `cdr_genre` and `discogs_genre` respectively.
+-   **`discogs_genre`** was removed in favour of `cdr_genre` because cdr has more reliable class definitions, thus improving internal validity.
+-   **Ambiguous columns** were removed: `featured_in_a_then_contemporary_play`, `featured_in_a_then_contemporary_film`, and `featured_in_a_then_contemporary_t_v_show`.
+-   All remaining character columns were converted to factors using `as.factor()`, and rows with any missing values were dropped with `drop_na()`.
 
 ```{r load-data}
 # Load the dataset
@@ -79,11 +67,13 @@ tuesdata <- tidytuesdayR::tt_load(2025, week = 34)
 billboard <- tuesdata$billboard
 topics <- tuesdata$topics
 ```
+
 ```{r join-data}
 # Join the two datasets
 billboard_joined <- billboard |>
   left_join(topics, by = c("lyrical_topic" = "lyrical_topics"))
 ```
+
 ```{r wrangle-data}
 billboard_clean <- billboard_joined |>
   # Remove identifier columns
@@ -122,9 +112,7 @@ billboard_clean <- billboard_joined |>
 
 ### Exploratory Data Analysis
 
-First, we find the summary statistics for our target variable, `weeks_at_number_one`, 
-and our key numeric predictors: `overall_rating`, `bpm`, `energy`, `danceability`, 
-`happiness`, `acousticness`, `loudness_d_b`, `front_person_age`, and `length_sec`.
+First, we find the summary statistics for our target variable, `weeks_at_number_one`, and our key numeric predictors: `overall_rating`, `bpm`, `energy`, `danceability`, `happiness`, `acousticness`, `loudness_d_b`, `front_person_age`, and `length_sec`.
 
 ```{r eda-summary, echo = FALSE}
 billboard_clean |>
@@ -146,9 +134,7 @@ billboard_clean |>
   kable(caption = "Summary statistics")
 ```
 
-
-Then, we examine the distribution of our target variable,
-`weeks_at_number_one`, to check for skewness.
+Then, we examine the distribution of our target variable, `weeks_at_number_one`, to check for skewness.
 
 ```{r eda-target-dist, fig.cap="Distribution of weeks at number one.", echo = FALSE}
 ggplot(billboard_clean, aes(x = weeks_at_number_one)) +
@@ -161,12 +147,9 @@ ggplot(billboard_clean, aes(x = weeks_at_number_one)) +
   theme_minimal()
 ```
 
-The distribution is heavily right-skewed. The majority of songs spent only
-1 to 3 weeks at #1, with counts dropping off sharply afterwards. A small
-number of songs stayed for 10 or more weeks, forming a long right tail.
+The distribution is heavily right-skewed. The majority of songs spent only 1 to 3 weeks at #1, with counts dropping off sharply afterwards. A small number of songs stayed for 10 or more weeks, forming a long right tail.
 
-Next, we examine the distributions of the five Spotify audio features, to
-identify any skewness that may require transformation before modelling.
+Next, we examine the distributions of the five Spotify audio features, to identify any skewness that may require transformation before modelling.
 
 ```{r eda-numeric-distributions, fig.cap="Distributions of the five Spotify audio features.", echo = FALSE}
 billboard_clean |>
@@ -187,13 +170,9 @@ billboard_clean |>
   theme_minimal()
 ```
 
-`acousticness` is heavily right-skewed, with most songs clustered near
-zero. `happiness` shows a bimodal pattern with peaks around 30 and around 80.
-`energy` is very slightly left-skewed, while `bpm` and `danceability` 
-are roughly normal.
+`acousticness` is heavily right-skewed, with most songs clustered near zero. `happiness` shows a bimodal pattern with peaks around 30 and around 80. `energy` is very slightly left-skewed, while `bpm` and `danceability` are roughly normal.
 
-Finally, we compare average `weeks_at_number_one` by genre to see whether
-certain genres are associated with longer chart runs.
+Finally, we compare average `weeks_at_number_one` by genre to see whether certain genres are associated with longer chart runs.
 
 ```{r eda-genre, fig.cap="Average weeks at number one by genre.", echo = FALSE}
 billboard_clean |>
@@ -213,19 +192,167 @@ billboard_clean |>
   theme_minimal()
 ```
 
-Electronic/Dance;Latin seems to have the highest average (~10 weeks).
-Pop;Reggae and Folk/Country;March also rank highly. Mainstream genres 
-like Pop and Rock sit in the middle of the range. At the lower end, we
-can find niche genres like Electronic/Dance;Funk/Soul, averaging to 1 week.
+Electronic/Dance;Latin seems to have the highest average (\~10 weeks). Pop;Reggae and Folk/Country;March also rank highly. Mainstream genres like Pop and Rock sit in the middle of the range. At the lower end, we can find niche genres like Electronic/Dance;Funk/Soul, averaging to 1 week.
 
 ### Feature Transformations
 
-Based on the Exploratory Data Analysis, three variables require transformation before modelling:
+Based on the Exploratory Data Analysis, two variables require transformation before modelling:
 
-- **`weeks_at_number_one`** is heavily right-skewed
-- **`acousticness`** is also heavily right-skewed
-- **`happiness`** is mildly left-skewed
+-   **`weeks_at_number_one`** is heavily right-skewed
+-   **`acousticness`** is also heavily right-skewed
 
-Therefore, we apply log transformation to these three variables to compresses the tail and produce
-a more symmetric target distribution. We will be using `log1p()` instead of `log()` to handle any 
-zero values in the data.
+Therefore, we apply log transformation to these three variables to compresses the tail and produce a more symmetric target distribution. We will be using `log1p()` instead of `log()` to handle any zero values in the data.
+
+```{r log-transformed}
+billboard_log_transformed <- billboard_clean |> 
+  mutate(
+    log_weeks_at_number_one = log1p(weeks_at_number_one),
+    log_acousticness = log1p(acousticness)
+  )
+```
+
+Moreover, several songs in the dataset were associated with more than one musical genre (for example, `Electronic/Dance; Latin` or `Pop;Funk/Soul`). Treating these combined labels as single categorical values would incorrectly imply that each combination represents a distinct genre and would lead to sparse, poorly interpretable factor levels. To address this, the `cdr_gerne` variable was processed as a multi-label feature. Individual genre were first separated into their component parts and then encoded as binary indicator variables using one-hot encoding.
+
+```{r one-hot-encoding for genre}
+billboard_genres <- billboard_log_transformed |> 
+  separate_rows(cdr_genre, sep = ";") |> 
+  mutate (cdr_genre = str_trim(cdr_genre))
+
+billboard_genres_wide <- billboard_genres |> 
+  mutate(value = 1) |> 
+  pivot_wider(
+    names_from = cdr_genre, 
+    values_from = value,
+    values_fill = 0
+  )
+```
+
+Transform the Simplified Key:
+``` {r simplify-key}
+billboard_simplify_key <- billboard_genres_wide |> 
+  mutate(
+    simplified_key = case_when(
+      simplified_key == "Multiple Keys"          ~ "Multiple Keys",
+      str_ends(simplified_key, "m")              ~ "Minor",  # Am, Bbm, Bm, Cm, etc.
+      TRUE                                        ~ "Major"  # A, Ab, B, Bb, C, etc.
+    ) |> as.factor()
+  )
+
+billboard_model_final <- billboard_simplify_key |> 
+  select(-weeks_at_number_one, -acousticness)
+```
+
+### Feature Selection
+#### Drop Redundant Columns
+- Demographic identity columns: Race and gender of the artist or producing crews don't directly cause a song to stay longer at #1, so we should drop these columns.
+- Songwriter/producer role overlaps
+- Timing collinearity
+- Lyric redundant content
+- External content
+
+```{r drop-manually}
+columns_to_drop <- c(
+  # Demographic identity
+  "artist_male","artist_white", "artist_black", "songwriter_male", "songwriter_white", "producer_male", "producer_white", 
+  # Artist structure
+  "artist_structure", "group_named_after_non_lead_singer",
+  # Songwriter/producer overlaps
+  "artist_is_only_songwriter", "artist_is_only_producer", "songwriter_is_a_producer",
+  # Timing
+  "instrumental_length_sec",  "intro_length_sec",
+  # Lyrical content 
+  "lyrical_topic","lyrical_narrative",
+  # External content
+  "written_for_a_play", "written_for_a_film", "written_for_a_t_v_show", "eurovision_entry", "topped_the_charts_by_multiple_artist", "associated_with_dance")
+
+billboard_manual_dropped <- billboard_model_final |>
+  select(-all_of(columns_to_drop))
+```
+
+#### Drop columns with nearly zero variance :
+```{r variance-test}
+# Identify and remove near-zero variance predictors
+nzv_cols <- nearZeroVar(billboard_manual_dropped, 
+                        freqCut = 95/5,  # flag if most common value appears 19x more than second most common
+                        uniqueCut = 5,   # flag if fewer than 5% unique values
+                        names = TRUE)
+nzv_cols
+
+billboard_model_selected <- billboard_manual_dropped |>
+  select(-all_of(nzv_cols))
+```
+### Regression Model 
+``` {r train-test-split}
+# Train/test split
+billboard_split <- initial_split(billboard_model_selected, prop = 0.7)
+train_data <- training(billboard_split)
+test_data <- testing(billboard_split)
+```
+
+``` {r model-setup}
+lm_recipe <- recipe(log_weeks_at_number_one ~ ., data = train_data) |>
+
+  # Convert any remaining factor predictors to dummy variables
+  # (simplified_key gets 3 dummies; reference level = "Major")
+  step_dummy(all_nominal_predictors(), one_hot = FALSE) |>
+
+  # Remove any predictor with near-zero variance that survived earlier filtering
+  step_nzv(all_predictors()) |>
+
+  # Centre and scale all numeric predictors for coefficient interpretability
+  step_normalize(all_numeric_predictors()) |>
+
+  # Drop any predictor that is a perfect linear combination of others
+  step_lincomb(all_numeric_predictors())
+
+# Inspect the processed training frame (sanity check)
+prep(lm_recipe) |> bake(new_data = NULL) |> glimpse()
+
+lm_spec <- linear_reg() |>
+  set_engine("lm") |>
+  set_mode("regression")
+
+lm_workflow <- workflow() |>
+  add_recipe(lm_recipe) |>
+  add_model(lm_spec)
+
+```
+
+``` {r cross-validation}
+set.seed(123)
+cv_folds <- vfold_cv(
+  train_data,
+  v       = 5,
+  repeats = 3,
+  strata  = log_weeks_at_number_one
+)
+
+cv_results <- fit_resamples(
+  lm_workflow,
+  resamples = cv_folds,
+  metrics   = metric_set(rmse, rsq, mae),
+  control   = control_resamples(save_pred = TRUE)
+)
+
+# Cross-validation summary
+cv_metrics <- collect_metrics(cv_results)
+print(cv_metrics)
+```
+
+```{r model-fit}
+final_fit <- fit(lm_workflow, data = train_data)
+```
+
+``` {r test_prediction}
+test_predictions <- predict(final_fit, new_data = test_data) |>
+  bind_cols(test_data |> select(log_weeks_at_number_one)) |>
+  rename(
+    predicted = .pred,
+    actual    = log_weeks_at_number_one
+  )
+
+test_metrics <- test_predictions |>
+  metrics(truth = actual, estimate = predicted)
+
+print(test_metrics)
+```
