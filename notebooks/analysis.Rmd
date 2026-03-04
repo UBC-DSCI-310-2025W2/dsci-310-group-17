@@ -356,3 +356,84 @@ test_metrics <- test_predictions |>
 
 print(test_metrics)
 ```
+
+### Result Visualization
+
+```{r visualization-1, fig.cap="Actual vs predicted weeks at number one on the test set (original scale)."}
+# Pre-compute R² as a plain string to avoid encoding issues with the superscript
+rsq_label <- paste0(
+  "R_squared = ",
+  round(
+    test_predictions |>
+      metrics(truth = actual, estimate = predicted) |>
+      filter(.metric == "rsq") |>
+      pull(.estimate),
+    3
+  )
+)
+
+p_actual_vs_predicted <- test_predictions |>
+  mutate(
+    actual_weeks    = expm1(actual),
+    predicted_weeks = expm1(predicted)
+  ) |>
+  ggplot(aes(x = actual_weeks, y = predicted_weeks)) +
+  geom_point(alpha = 0.4, colour = "steelblue", size = 2) +
+  geom_abline(
+    slope     = 1,
+    intercept = 0,
+    linetype  = "dashed",
+    colour    = "firebrick",
+    linewidth = 0.8
+  ) +
+  annotate(
+    "text",
+    x      = 12,
+    y      = 2,
+    label  = rsq_label,   # plain ASCII string — no special characters
+    colour = "firebrick",
+    size   = 4
+  ) +
+  labs(
+    title    = "Actual vs Predicted Weeks at #1 (Test Set)",
+    subtitle = "Dashed line = perfect prediction; points below = underestimate",
+    x        = "Actual Weeks at #1",
+    y        = "Predicted Weeks at #1"
+  ) +
+  theme_minimal()
+
+print(p_actual_vs_predicted)
+```
+
+```{r visualization-2, fig.cap="Top 15 predictors by standardised coefficient magnitude."}
+# Extract coefficients safely using broom::tidy explicitly
+coef_data <- broom::tidy(extract_fit_engine(final_fit)) |>
+  filter(term != "(Intercept)") |>
+  arrange(desc(abs(estimate))) |>
+  slice_head(n = 15) |>
+  mutate(
+    direction = if_else(estimate > 0, "Positive", "Negative"),
+    term      = str_replace_all(term, "_", " ") |> str_to_title()
+  )
+
+p_coefficients <- ggplot(
+  coef_data,
+  aes(x = reorder(term, abs(estimate)), y = estimate, fill = direction)
+) +
+  geom_col(show.legend = TRUE) +
+  coord_flip() +
+  scale_fill_manual(
+    values = c("Positive" = "steelblue", "Negative" = "firebrick"),
+    name   = "Effect on\nlog(weeks + 1)"
+  ) +
+  labs(
+    title    = "Top 15 Predictors by Coefficient Magnitude",
+    subtitle = "Standardised coefficients - larger absolute value = stronger effect",
+    x        = NULL,
+    y        = "Standardised Coefficient"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "right")
+
+print(p_coefficients)
+```
