@@ -227,8 +227,9 @@ billboard_genres_wide <- billboard_genres |>
   )
 ```
 
-Transform the Simplified Key:
-``` {r simplify-key}
+The `simplified_key` variable originally contained 25 levels representing individual musical keys in standard notation (e.g. `C`, `Am`, `Bbm`). Retaining all 25 levels would generate an excessive number of dummy variable during modelling, introducing sparsity and increasing the risk of overfitting. To address this, the keys were collapsed into three musically meaningful categories: Major (e.g. `C`, `Ab`, `F`), Minor (e.g. `Am`,`Bbm`, `Em`), and Multiple Keys.
+
+```{r simplify-key}
 billboard_simplify_key <- billboard_genres_wide |> 
   mutate(
     simplified_key = case_when(
@@ -243,12 +244,16 @@ billboard_model_final <- billboard_simplify_key |>
 ```
 
 ### Feature Selection
+
 #### Drop Redundant Columns
-- Demographic identity columns: Race and gender of the artist or producing crews don't directly cause a song to stay longer at #1, so we should drop these columns.
-- Songwriter/producer role overlaps
-- Timing collinearity
-- Lyric redundant content
-- External content
+
+Columns were dropped on conceptual grounds across five categories:
+
+-   Demographic identity columns encoding the race and gender of artists, songwriters, and producers.
+-   Artist structure indicators, songwriter/producer role overlap columns.
+-   Timing-derived columns.
+-   Lyric redundant content.
+-   External content.
 
 ```{r drop-manually}
 columns_to_drop <- c(
@@ -270,42 +275,41 @@ billboard_manual_dropped <- billboard_model_final |>
 ```
 
 #### Drop columns with nearly zero variance :
+
+Near-zero variance predictors were identified and removed using `nearZeroVar()` from the `caret` package. A predictor was flagged for removal if it met either of two criteria: its most common value appeared at least 19 times more frequently than the second most common value (`freqCut = 95/5`), or fewer than 5% of its values were unique (`uniqueCut = 5`).
+
 ```{r variance-test}
 # Identify and remove near-zero variance predictors
 nzv_cols <- nearZeroVar(billboard_manual_dropped, 
-                        freqCut = 95/5,  # flag if most common value appears 19x more than second most common
-                        uniqueCut = 5,   # flag if fewer than 5% unique values
+                        freqCut = 95/5,  
+                        uniqueCut = 5,
                         names = TRUE)
 nzv_cols
 
 billboard_model_selected <- billboard_manual_dropped |>
   select(-all_of(nzv_cols))
 ```
-### Regression Model 
-``` {r train-test-split}
+
+### Regression Model
+
+Split the dataset into training and testing sets, with 705 of the observations allocated to the training set and 30% to the testing set.
+
+```{r train-test-split}
 # Train/test split
 billboard_split <- initial_split(billboard_model_selected, prop = 0.7)
 train_data <- training(billboard_split)
 test_data <- testing(billboard_split)
 ```
 
-``` {r model-setup}
+A linear regression workflow was constructed using a preprocessing recipe that dummy-encoded categorical variables, removed near-zero variance and collinear predictors, and standardized numeric predictors. The model was fit using ordinary least squares on the training data.
+
+```{r model-setup}
 lm_recipe <- recipe(log_weeks_at_number_one ~ ., data = train_data) |>
-
-  # Convert any remaining factor predictors to dummy variables
-  # (simplified_key gets 3 dummies; reference level = "Major")
   step_dummy(all_nominal_predictors(), one_hot = FALSE) |>
-
-  # Remove any predictor with near-zero variance that survived earlier filtering
   step_nzv(all_predictors()) |>
-
-  # Centre and scale all numeric predictors for coefficient interpretability
   step_normalize(all_numeric_predictors()) |>
-
-  # Drop any predictor that is a perfect linear combination of others
   step_lincomb(all_numeric_predictors())
 
-# Inspect the processed training frame (sanity check)
 prep(lm_recipe) |> bake(new_data = NULL) |> glimpse()
 
 lm_spec <- linear_reg() |>
@@ -318,7 +322,9 @@ lm_workflow <- workflow() |>
 
 ```
 
-``` {r cross-validation}
+The linear regression workflow was evaluated using repeated 5-fold cross-validation, stratified by `log_weeks_at_number_one` , with RMSE, $R^2$ , and MAE used as performance metrics.
+
+```{r cross-validation}
 set.seed(123)
 cv_folds <- vfold_cv(
   train_data,
@@ -339,11 +345,15 @@ cv_metrics <- collect_metrics(cv_results)
 print(cv_metrics)
 ```
 
+Fit the model to the training data
+
 ```{r model-fit}
 final_fit <- fit(lm_workflow, data = train_data)
 ```
 
-``` {r test_prediction}
+The fitted model was evaluated on the test set by comparing predicted and observed values using RMSE, $R^2$ , and MAE.
+
+```{r test_prediction}
 test_predictions <- predict(final_fit, new_data = test_data) |>
   bind_cols(test_data |> select(log_weeks_at_number_one)) |>
   rename(
@@ -357,10 +367,14 @@ test_metrics <- test_predictions |>
 print(test_metrics)
 ```
 
-### Result Visualization
+### Results
+
+#### Visualization
+
+Actual version predicted weeks at number one on the test set, shown on the original scale, with the red dashed line indicating perfect prediction.
 
 ```{r visualization-1, fig.cap="Actual vs predicted weeks at number one on the test set (original scale)."}
-# Pre-compute R² as a plain string to avoid encoding issues with the superscript
+
 rsq_label <- paste0(
   "R_squared = ",
   round(
@@ -390,7 +404,7 @@ p_actual_vs_predicted <- test_predictions |>
     "text",
     x      = 12,
     y      = 2,
-    label  = rsq_label,   # plain ASCII string — no special characters
+    label  = rsq_label, 
     colour = "firebrick",
     size   = 4
   ) +
@@ -405,7 +419,10 @@ p_actual_vs_predicted <- test_predictions |>
 print(p_actual_vs_predicted)
 ```
 
+Top 15 predictors by standardized coefficient magnitude, with color indicating positive or negative effect on the response.
+
 ```{r visualization-2, fig.cap="Top 15 predictors by standardised coefficient magnitude."}
+
 # Extract coefficients safely using broom::tidy explicitly
 coef_data <- broom::tidy(extract_fit_engine(final_fit)) |>
   filter(term != "(Intercept)") |>
