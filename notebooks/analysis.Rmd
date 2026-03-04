@@ -34,7 +34,7 @@ The Billboard Hot 100 dataset provides us with two datasets: `billboard.csv`, wh
 
 ### Load libraries and set seed
 
-```{r load-libraries}
+```{r load-libraries, warning=FALSE, message = FALSE}
 library(tidyverse)
 library(tidytuesdayR)
 library(knitr)
@@ -234,8 +234,8 @@ billboard_simplify_key <- billboard_genres_wide |>
   mutate(
     simplified_key = case_when(
       simplified_key == "Multiple Keys"          ~ "Multiple Keys",
-      str_ends(simplified_key, "m")              ~ "Minor",  # Am, Bbm, Bm, Cm, etc.
-      TRUE                                        ~ "Major"  # A, Ab, B, Bb, C, etc.
+      str_ends(simplified_key, "m")              ~ "Minor",  
+      TRUE                                        ~ "Major"  
     ) |> as.factor()
   )
 
@@ -245,7 +245,7 @@ billboard_model_final <- billboard_simplify_key |>
 
 ### Feature Selection
 
-#### Drop Redundant Columns
+#### Drop Redundant Columns 
 
 Columns were dropped on conceptual grounds across five categories:
 
@@ -274,7 +274,7 @@ billboard_manual_dropped <- billboard_model_final |>
   select(-all_of(columns_to_drop))
 ```
 
-#### Drop columns with nearly zero variance :
+#### Drop columns with nearly zero variance  
 
 Near-zero variance predictors were identified and removed using `nearZeroVar()` from the `caret` package. A predictor was flagged for removal if it met either of two criteria: its most common value appeared at least 19 times more frequently than the second most common value (`freqCut = 95/5`), or fewer than 5% of its values were unique (`uniqueCut = 5`).
 
@@ -284,7 +284,6 @@ nzv_cols <- nearZeroVar(billboard_manual_dropped,
                         freqCut = 95/5,  
                         uniqueCut = 5,
                         names = TRUE)
-nzv_cols
 
 billboard_model_selected <- billboard_manual_dropped |>
   select(-all_of(nzv_cols))
@@ -309,8 +308,6 @@ lm_recipe <- recipe(log_weeks_at_number_one ~ ., data = train_data) |>
   step_nzv(all_predictors()) |>
   step_normalize(all_numeric_predictors()) |>
   step_lincomb(all_numeric_predictors())
-
-prep(lm_recipe) |> bake(new_data = NULL) |> glimpse()
 
 lm_spec <- linear_reg() |>
   set_engine("lm") |>
@@ -410,13 +407,12 @@ p_actual_vs_predicted <- test_predictions |>
   ) +
   labs(
     title    = "Actual vs Predicted Weeks at #1 (Test Set)",
-    subtitle = "Dashed line = perfect prediction; points below = underestimate",
     x        = "Actual Weeks at #1",
     y        = "Predicted Weeks at #1"
   ) +
   theme_minimal()
 
-print(p_actual_vs_predicted)
+p_actual_vs_predicted
 ```
 
 Top 15 predictors by standardized coefficient magnitude, with color indicating positive or negative effect on the response.
@@ -445,12 +441,16 @@ p_coefficients <- ggplot(
   ) +
   labs(
     title    = "Top 15 Predictors by Coefficient Magnitude",
-    subtitle = "Standardised coefficients - larger absolute value = stronger effect",
     x        = NULL,
     y        = "Standardised Coefficient"
   ) +
   theme_minimal() +
   theme(legend.position = "right")
 
-print(p_coefficients)
+p_coefficients
+coef_data
 ```
+
+#### Result Interpretation
+
+The linear regression model demonstrated weak predictive performance, with cross-validation yielding at $R^2$ of 0.063 (RMSE = 0.505, MAE = 0.415) and test set evaluation confirming this with an $R^2$ of 0.052 (RMSE = 0.502, MAE = 0.395). The close alignment between cross-validation and test metrics indicates the model generalizes consistently, thought its overall explanatory power remains low. As shown in Figure 4, the model can not properly predict the values of weeks that song remains at 1. Among the most 15 influential predictors, `energy` has the strongest effect at ($\beta = -0.119, p < 0.001$), suggesting that lower-energy songs tend to stay longer at #1, followed by `loudness` ($\beta = 0.096, p < 0.001$) and `overall_rating` ($\beta = 0.061, p = 0.003$). However, the majority of predictors, including `sample`, `interpolation`, `explicit`, and `Rock`, were not statistically significant at the 0.05 level, indicating that most structural and genre features carry little predictive signal once audio features are accounted for.
