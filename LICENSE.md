@@ -31,4 +31,4 @@ SOFTWARE.
 The written report and documentation in this repository are licensed under the
 Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 
-License details: https://creativecommons.org/licenses/by-nc-nd/4.0/
+License details: <https://creativecommons.org/licenses/by-nc-nd/4.0/>
