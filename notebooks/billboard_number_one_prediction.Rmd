@@ -310,7 +310,9 @@ Split the dataset into training and testing sets, with 705 of the observations a
 # Train/test split
 billboard_split <- initial_split(billboard_model_selected, prop = 0.7)
 train_data <- training(billboard_split)
+write_csv(train_data, "../data/processed/billboard_model_training.csv")
 test_data <- testing(billboard_split)
+write_csv(test_data, "../data/processed/billboard_model_testing.csv")
 ```
 
 A linear regression workflow was constructed using a preprocessing recipe that dummy-encoded categorical variables, removed near-zero variance and collinear predictors, and standardized numeric predictors. The model was fit using ordinary least squares on the training data.
