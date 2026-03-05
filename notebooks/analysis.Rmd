@@ -14,7 +14,7 @@ Insert a summary of your analysis here.
 
 ## Introduction
 
-Insert an introduction to your analysis here.
+The magazine 'Billboard' is a leading source of information on trends in music popularity and innovation. Following the launch of Billboard.com, weekly rankings of the top 100 songs in the world have been made publically available. (Billboard, nd.) In this analysis, we use linear regression on this data to predict the number of weeks a song remains at the number 1 spot in the rankings. 
 
 ## Methods and Results
 
@@ -454,3 +454,11 @@ coef_data
 #### Result Interpretation
 
 The linear regression model demonstrated weak predictive performance, with cross-validation yielding at $R^2$ of 0.063 (RMSE = 0.505, MAE = 0.415) and test set evaluation confirming this with an $R^2$ of 0.052 (RMSE = 0.502, MAE = 0.395). The close alignment between cross-validation and test metrics indicates the model generalizes consistently, thought its overall explanatory power remains low. As shown in Figure 4, the model can not properly predict the values of weeks that song remains at 1. Among the most 15 influential predictors, `energy` has the strongest effect at ($\beta = -0.119, p < 0.001$), suggesting that lower-energy songs tend to stay longer at #1, followed by `loudness` ($\beta = 0.096, p < 0.001$) and `overall_rating` ($\beta = 0.061, p = 0.003$). However, the majority of predictors, including `sample`, `interpolation`, `explicit`, and `Rock`, were not statistically significant at the 0.05 level, indicating that most structural and genre features carry little predictive signal once audio features are accounted for.
+
+
+### Discussion
+
+
+### Citations 
+Insert ciations here.
+[https://www.billboard.com/music/music-news/about-us-467859/](URL)
