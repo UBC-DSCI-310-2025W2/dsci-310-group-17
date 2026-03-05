@@ -26,7 +26,7 @@ The Billboard Hot 100 dataset provides us with two datasets: `billboard.csv`, wh
 
 2.  **Exploratory Data Analysis:** explore the data to understand the distribution of features and their relationships with the target variable
 
-3.  **Model Building:** build a regression model to predict the number of weeks a song stays at #1 based on its features
+3. **Feature Transformations & Selection:** applied `log1p()` to skewed variables, one-hot encoded `cdr_genre`, and collapsed `simplified_key` into three categories. Then, manually dropped irrelevant columns and used `nearZeroVar()` to remove predictors with near-zero variance.
 
 4.  **Model Evaluation:** evaluate the performance of our model using appropriate metrics and validation techniques
 
