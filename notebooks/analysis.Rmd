@@ -28,7 +28,7 @@ The Billboard Hot 100 dataset provides us with two datasets: `billboard.csv`, wh
 
 3. **Feature Transformations & Selection:** applied `log1p()` to skewed variables, one-hot encoded `cdr_genre`, and collapsed `simplified_key` into three categories. Then, manually dropped irrelevant columns and used `nearZeroVar()` to remove predictors with near-zero variance.
 
-4.  **Model Evaluation:** evaluate the performance of our model using appropriate metrics and validation techniques
+4. **Model Building & Evaluation:** split the data 70/30, fit an ordinary least squares model using a `tidymodels` workflow. Then, evaluate the model using a repeated 5-fold cross-validation and test set metrics (RMSE, $R^2$, MAE).
 
 5.  **Results and Conclusion:** summarize our findings, discuss the implications of our results, and suggest potential future work or improvements to our analysis
 
