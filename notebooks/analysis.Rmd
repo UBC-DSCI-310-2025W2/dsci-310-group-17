@@ -74,6 +74,13 @@ billboard_joined <- billboard |>
   left_join(topics, by = c("lyrical_topic" = "lyrical_topics"))
 ```
 
+```{r save-raw-data}
+# Save raw datasets to data/raw/
+dir.create("../data/raw", recursive = TRUE, showWarnings = FALSE)
+write_csv(billboard, "../data/raw/billboard.csv")
+write_csv(topics, "../data/raw/topics.csv")
+```
+
 ```{r wrangle-data}
 billboard_clean <- billboard_joined |>
   # Remove identifier columns
@@ -287,6 +294,12 @@ nzv_cols <- nearZeroVar(billboard_manual_dropped,
 
 billboard_model_selected <- billboard_manual_dropped |>
   select(-all_of(nzv_cols))
+```
+
+```{r save-processed-data}
+# Save processed dataset
+dir.create("../data/processed", recursive = TRUE, showWarnings = FALSE)
+write_csv(billboard_model_selected, "../data/processed/billboard_model_selected.csv")
 ```
 
 ### Regression Model
