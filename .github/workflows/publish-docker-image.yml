@@ -27,4 +27,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: YOUR_DOCKERHUB_USERNAME/dsci-310-group-17:latest
+        tags: ruk2712/dsci-310-group-17:latest
