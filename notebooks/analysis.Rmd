@@ -10,11 +10,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Summary
 
-Insert a summary of your analysis here.
+The objective of this analysis is to use publicly available song information from the Billboard Hot 100  song rankings to investigate the question:
+_Given various metrics about a song (energy, beats per minute, etc.), how many weeks, if any, will a song remain at the top position in the Billboard Hot 100 rankings? Which features contribute most to our model’s predictions?_ 
 
 ## Introduction
 
-The magazine 'Billboard' is a leading source of information on trends in music popularity and innovation. Following the launch of Billboard.com, weekly rankings of the top 100 songs in the world have been made publically available. (Billboard, nd.) In this analysis, we use linear regression on this data to predict the number of weeks a song remains at the number 1 spot in the rankings. 
+The magazine “Billboard” is a leading source of information on trends in music popularity and innovation. Following the launch of the magazine in 1958, weekly rankings of the top 100 songs in the US have been made publicly available. (Billboard, nd) The dataset that we have selected is open-source tidytuesday dataset which documents these billboard rankings from from August 4th 1958, until January 11th 2025.  It provides features such as lyrics, song-structure, and featured_artists for each song in the ranking. These features can then be used for song popularity predictions or music trend forecasting. In this analysis, we use linear regression to predict the number of weeks a song remains at the #1 spot in the rankings, and assess our model’s performance using RMSE, MAE and R**2. Even though our results show that our regressor has a weak performance, information regarding feature importances in model decision-making remain useful in determining a song’s overall popularity. 
 
 ## Methods and Results
 
@@ -462,3 +463,4 @@ The linear regression model demonstrated weak predictive performance, with cross
 ### Citations 
 Insert ciations here.
 [https://www.billboard.com/music/music-news/about-us-467859/](URL)
+[https://github.com/rfordatascience/tidytuesday/blob/main/data/2025/2025-08-26/readme.md](URL)
