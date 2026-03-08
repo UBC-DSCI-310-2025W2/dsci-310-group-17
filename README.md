@@ -70,4 +70,6 @@ For the complete list of all pinned dependencies, see `renv.lock`.
 ## Licenses
 
 The software code in this project is licensed under the MIT License.  
-The written analysis and reports are licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (CC BY-NC-ND 4.0). See `LICENSE.md` for details.
+The written analysis and reports are licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (CC BY-NC-ND 4.0). 
+See `LICENSE.md` for details.
+
