@@ -2,7 +2,7 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ "main" , "fix-docker-platform"]
+    branches: [ "main" ]
     paths: 
       - "Dockerfile"
   workflow_dispatch:
