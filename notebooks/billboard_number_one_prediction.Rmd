@@ -2,6 +2,7 @@
 title: "Predicting Billboard #1 Hits"
 output: pdf_document
 date: "Authors: May Eindra Tet Toe, Anastasia Tountas, Tran Anh Thu Phung, Harry Nguyen"
+bibliography: references.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -10,11 +11,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Summary
 
-Insert a summary of your analysis here.
+The objective of this analysis is to use publicly available song information from the Billboard Hot 100  song rankings to investigate the question:
+
+**Given various metrics about a song (energy, beats per minute, etc.), how many weeks, if any, will a song remain at the top position in the Billboard Hot 100 rankings? Which features contribute most to our model’s predictions?** 
 
 ## Introduction
 
-Insert an introduction to your analysis here.
+The magazine “Billboard” is a leading source of information on trends in music popularity and innovation. Following the launch of the magazine in 1958, weekly rankings of the top 100 songs in the US have been made publicly available. [@billboard] The dataset that we have selected is open-source Tidy Tuesday [@tidytuesday] dataset which documents these billboard rankings from August 4th 1958, until January 11th 2025.  It provides features such as lyrics, song-structure, and featured_artists for each song in the ranking. These features can then be used for song popularity predictions or music trend forecasting. In this analysis, we use linear regression to predict the number of weeks a song remains at the #1 spot in the rankings, and assess our model’s performance using RMSE, MAE and $R^2$. Even though our results show that our regressor has a weak performance, information regarding feature importances in model decision-making remain useful in determining a song’s overall popularity. 
 
 ## Methods and Results
 
@@ -469,3 +472,17 @@ coef_data
 #### Result Interpretation
 
 The linear regression model demonstrated weak predictive performance, with cross-validation yielding at $R^2$ of 0.063 (RMSE = 0.505, MAE = 0.415) and test set evaluation confirming this with an $R^2$ of 0.052 (RMSE = 0.502, MAE = 0.395). The close alignment between cross-validation and test metrics indicates the model generalizes consistently, thought its overall explanatory power remains low. As shown in Figure 4, the model can not properly predict the values of weeks that song remains at 1. Among the most 15 influential predictors, `energy` has the strongest effect at ($\beta = -0.119, p < 0.001$), suggesting that lower-energy songs tend to stay longer at #1, followed by `loudness` ($\beta = 0.096, p < 0.001$) and `overall_rating` ($\beta = 0.061, p = 0.003$). However, the majority of predictors, including `sample`, `interpolation`, `explicit`, and `Rock`, were not statistically significant at the 0.05 level, indicating that most structural and genre features carry little predictive signal once audio features are accounted for.
+
+### Discussion
+The objective of our analysis was to use a linear regression model to predict the number of weeks a song would remain at the #1 spot of the Billboard Hot 100 song rankings (`weeks_at_number_one`)  given open source data. Unnecessary features and features risking data-leakage into the predictive model were removed, and the skewed numerical features were transformed. One Hot Encoding was applied on categorical features, including genre and musical key; to predict on the data. Following this preprocessing, the linear regression model was trained the predictions were compared to the ground truth of weeks at the #1 spot. We found that in spite of its limited predictive power, that the model generalizes well onto unseen data due to the small difference between training and testing error, and that the top 3 statistically significant features involved in prediction were Energy, Loudness, and overall rating. From the coefficient values, we can conclude that weeks a song remains at the number one position is most associated with lower energy, higher loudness, and higher overall popularity. 
+
+Previous literature has also investigated song popularity with various models including KNN, linear regression, Random forest (and other tree-based models), and neural networks. Although these models have varying levels of predictive performance, song popularity is documented as a challenge to predict due to the nuanced level of the problem. Factors including individual preferences, globalization of music through various streaming platforms, and global events contribute to the challenge of measuring and influencing song popularity. [@ts2023] Further, global music trends and top performing artists have shifted since the introduction of streaming platforms, and song lengths have decreased to adjust to preferences over time. [@kim2021; @ts2023] Since our analysis spans multiple decades, world events, and to the adjustment of streaming platforms, these external factors could be influencing our $R^2$ value and error metrics. This means that songs with popular characteristic features leading to a high number of weeks at the top position from the 1950’s or 60’s, may not generalize well to features from popular songs in the 21st century. Therefore, the low preodicitive power of our model was expected. 
+
+A specific example of classifier implementation was conducted by Kim in 2021. This study, similar to the present study, investigated the impact of various features contributing to song popularity from 2010-2019 using Spotify data, and analyzed the performance through the RMSE of logistic regression, KNN, and Random Forest models. The lowest RMSE score was associated with the logistic regression model, followed by KNN and Random forest. [@kim2021] 
+
+Overall, this regression model provides good predictions given the data, historical trends in music forecasting, and questions being investigated; in spite of its weak predictive patterns. It adds to previous literature, by implementing different features and conducting a longitudinal study. The impact of our results can be used to determine how trends in music have changed overtime. Based on our findings, improvements/future research quests can be made through training separate models for the data into the 20th vs the 21st century, or by decade, to improve performance; while retaining longitudinal nature. 
+
+
+### References 
+
+
