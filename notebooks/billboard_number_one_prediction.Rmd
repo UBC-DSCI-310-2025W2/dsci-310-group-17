@@ -77,6 +77,13 @@ billboard_joined <- billboard |>
   left_join(topics, by = c("lyrical_topic" = "lyrical_topics"))
 ```
 
+```{r save-raw-data}
+# Save raw datasets to data/raw/
+dir.create("../data/raw", recursive = TRUE, showWarnings = FALSE)
+write_csv(billboard, "../data/raw/billboard.csv")
+write_csv(topics, "../data/raw/topics.csv")
+```
+
 ```{r wrangle-data}
 billboard_clean <- billboard_joined |>
   # Remove identifier columns
@@ -292,6 +299,12 @@ billboard_model_selected <- billboard_manual_dropped |>
   select(-all_of(nzv_cols))
 ```
 
+```{r save-processed-data}
+# Save processed dataset
+dir.create("../data/processed", recursive = TRUE, showWarnings = FALSE)
+write_csv(billboard_model_selected, "../data/processed/billboard_model_selected.csv")
+```
+
 ### Regression Model
 
 Split the dataset into training and testing sets, with 705 of the observations allocated to the training set and 30% to the testing set.
@@ -300,7 +313,9 @@ Split the dataset into training and testing sets, with 705 of the observations a
 # Train/test split
 billboard_split <- initial_split(billboard_model_selected, prop = 0.7)
 train_data <- training(billboard_split)
+write_csv(train_data, "../data/processed/billboard_model_training.csv")
 test_data <- testing(billboard_split)
+write_csv(test_data, "../data/processed/billboard_model_testing.csv")
 ```
 
 A linear regression workflow was constructed using a preprocessing recipe that dummy-encoded categorical variables, removed near-zero variance and collinear predictors, and standardized numeric predictors. The model was fit using ordinary least squares on the training data.
@@ -458,7 +473,6 @@ coef_data
 
 The linear regression model demonstrated weak predictive performance, with cross-validation yielding at $R^2$ of 0.063 (RMSE = 0.505, MAE = 0.415) and test set evaluation confirming this with an $R^2$ of 0.052 (RMSE = 0.502, MAE = 0.395). The close alignment between cross-validation and test metrics indicates the model generalizes consistently, thought its overall explanatory power remains low. As shown in Figure 4, the model can not properly predict the values of weeks that song remains at 1. Among the most 15 influential predictors, `energy` has the strongest effect at ($\beta = -0.119, p < 0.001$), suggesting that lower-energy songs tend to stay longer at #1, followed by `loudness` ($\beta = 0.096, p < 0.001$) and `overall_rating` ($\beta = 0.061, p = 0.003$). However, the majority of predictors, including `sample`, `interpolation`, `explicit`, and `Rock`, were not statistically significant at the 0.05 level, indicating that most structural and genre features carry little predictive signal once audio features are accounted for.
 
-
 ### Discussion
 The objective of our analysis was to use a linear regression model to predict the number of weeks a song would remain at the #1 spot of the Billboard Hot 100 song rankings (`weeks_at_number_one`)  given open source data. Unnecessary features and features risking data-leakage into the predictive model were removed, and the skewed numerical features were transformed. One Hot Encoding was applied on categorical features, including genre and musical key; to predict on the data. Following this preprocessing, the linear regression model was trained the predictions were compared to the ground truth of weeks at the #1 spot. We found that in spite of its limited predictive power, that the model generalizes well onto unseen data due to the small difference between training and testing error, and that the top 3 statistically significant features involved in prediction were Energy, Loudness, and overall rating. From the coefficient values, we can conclude that weeks a song remains at the number one position is most associated with lower energy, higher loudness, and higher overall popularity. 
 
@@ -470,6 +484,5 @@ Overall, this regression model provides good predictions given the data, histori
 
 
 ### References 
-
 
 

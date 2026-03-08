@@ -1,50 +1,75 @@
 # Predicting Billboard #1 Hits
 
-**Authors/Contributors:** May Eindra Tet Toe, Anastasia Tountas, Tran Anh Thu Phung, Harry Nguyen
+## Contributors/Authors
+
+- May Eindra Tet Toe
+- Anastasia Tountas
+- Tran Anh Thu Phung
+- Harry Nguyen
 
 ## Summary
 
-This project uses the *Billboard Hot 100 #1 hits* dataset to build a regression model that predicts **how many weeks a song stays at #1** based on song-level features (e.g., musical attributes and lyrical topics). At a high level, our goal is to identify which measurable characteristics are most associated with longer runs at the top of the charts and assess how accurately we can predict a #1 song’s longevity using those features. The results can help quantify what types of songs tend to have longer chart dominance and provide insight into how well these features explain weeks-at-#1.
+This project asks the predictive question: **Can we predict how many weeks a song stays at #1 on the Billboard Hot 100 chart based on its song-level features, such as musical attributes and lyrical topics?**
 
-## How to run the analysis
+We use a publicly available Billboard Hot 100 dataset combined with Spotify audio features to build a regression model that predicts the number of weeks a song remains at the top of the charts. Our goal is to identify which measurable characteristics are most associated with longer runs at #1 and to assess how accurately we can predict a #1 song's longevity using those features. The results help quantify what types of songs tend to have longer chart dominance and provide insight into how well these features explain weeks-at-#1.
 
-### Option A (recommended): Docker
+## How to Run the Analysis
 
-*Docker instructions will be added once the Docker environment is built for this project.*
+1. Clone this repository:
 
-### Option B: Run locally (R)
+   ```bash
+   git clone git@github.com:UBC-DSCI-310-2025W2/dsci-310-group-17.git
+   cd dsci-310-group-17
+   ```
 
-1. Clone this repository.
-2. Open the RMarkdown file in RStudio.
-3. Install required R packages (see **Dependencies** below).
-4. Knit the RMarkdown file or run the code chunks interactively.
+2. Build the Docker image:
 
-> Note: The analysis downloads the raw data from the web and writes it into the `data/` directory.
+   ```bash
+   docker build -t billboard-analysis .
+   ```
+
+3. Run the container:
+
+   ```bash
+   docker run -p 8787:8787 \
+       -e PASSWORD=billboard \
+       -v "$(pwd)":/home/rstudio/project \
+       billboard-analysis
+   ```
+
+4. Open <http://localhost:8787> in your browser.
+
+5. Log in with:
+   - **Username:** `rstudio`
+   - **Password:** `billboard`
+
+6. In the RStudio file pane, open `billboard_number_one_prediction.Rmd` and knit the document (**Knit → Knit to HTML**) or run all chunks.
 
 ## Dependencies
 
-This project is written in **R** and is intended to be run via an RMarkdown workflow.
+This project uses R 4.5.2 and manages package dependencies with `renv`. All package versions are pinned in `renv.lock`. Running the analysis inside the provided Docker container ensures all dependencies are automatically installed at the correct versions.
 
-Key R packages used include (not exhaustive):
+Key dependencies include:
 
-- `tidyverse`
-- `tidymodels`
-- `readr`
-- `dplyr`
-- `ggplot2`
+| Package     | Version |
+|-------------|---------|
+| R           | 4.5.2   |
+| tidyverse   | 2.0.0   |
+| ggplot2     | 4.0.1   |
+| dplyr       | 1.1.4   |
+| readr       | 2.1.6   |
+| knitr       | 1.50    |
+| caret       | 7.0-1   |
+| broom       | 1.0.10  |
+| MASS        | 7.3-65  |
+| Matrix      | 1.7-4   |
+| Rcpp        | 1.1.0   |
 
-A fully pinned and reproducible computational environment will be provided via **Docker** in a later step.
-
-## Repository structure (Milestone 1)
-
-- `data/`: data downloaded via code and saved locally for the analysis
-- `*.Rmd`: the monolithic RMarkdown report containing the full analysis
-- `Dockerfile`: (to be added) container specification for a reproducible environment
-- `.github/workflows/publish_docker_image.yml`: (to be added/updated) GitHub Actions workflow to build and publish the Docker image
+For the complete list of all pinned dependencies, see `renv.lock`.
 
 ## Licenses
 
-- **Code license:** MIT License  
-- **Report license:** Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)
+The software code in this project is licensed under the MIT License.  
+The written analysis and reports are licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (CC BY-NC-ND 4.0). 
 
 See `LICENSE.md` for details.
