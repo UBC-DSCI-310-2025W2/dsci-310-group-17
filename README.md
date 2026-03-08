@@ -1,7 +1,5 @@
 # Predicting Billboard #1 Hits
 
----
-
 ## Contributors/Authors
 
 - May Eindra Tet Toe
@@ -9,15 +7,11 @@
 - Tran Anh Thu Phung
 - Harry Nguyen
 
----
-
 ## Summary
 
 This project asks the predictive question: **Can we predict how many weeks a song stays at #1 on the Billboard Hot 100 chart based on its song-level features, such as musical attributes and lyrical topics?**
 
 We use a publicly available Billboard Hot 100 dataset combined with Spotify audio features to build a regression model that predicts the number of weeks a song remains at the top of the charts. Our goal is to identify which measurable characteristics are most associated with longer runs at #1 and to assess how accurately we can predict a #1 song's longevity using those features. The results help quantify what types of songs tend to have longer chart dominance and provide insight into how well these features explain weeks-at-#1.
-
----
 
 ## How to Run the Analysis
 
@@ -51,8 +45,6 @@ We use a publicly available Billboard Hot 100 dataset combined with Spotify audi
 
 6. In the RStudio file pane, open `billboard_number_one_prediction.Rmd` and knit the document (**Knit → Knit to HTML**) or run all chunks.
 
----
-
 ## Dependencies
 
 This project uses R 4.5.2 and manages package dependencies with `renv`. All package versions are pinned in `renv.lock`. Running the analysis inside the provided Docker container ensures all dependencies are automatically installed at the correct versions.
@@ -74,8 +66,6 @@ Key dependencies include:
 | Rcpp        | 1.1.0   |
 
 For the complete list of all pinned dependencies, see `renv.lock`.
-
----
 
 ## Licenses
 
