@@ -1,4 +1,4 @@
-FROM rocker/verse:4.5.2
+FROM --platform=linux/amd64 rocker/verse:4.5.2
 
 WORKDIR /home/rstudio/project
 
