@@ -9,9 +9,9 @@
 
 ## Summary
 
-This project asks the predictive question: **Can we predict how many weeks a song stays at #1 on the Billboard Hot 100 chart based on its song-level features, such as musical attributes and lyrical topics?**
+This project asks the predictive question: Can we predict how many weeks a song stays at #1 on the Billboard Hot 100 chart based on its song-level features, such as musical attributes and lyrical topics?
 
-We use a publicly available Billboard Hot 100 dataset combined with Spotify audio features to build a regression model that predicts the number of weeks a song remains at the top of the charts. Our goal is to identify which measurable characteristics are most associated with longer runs at #1 and to assess how accurately we can predict a #1 song's longevity using those features. The results help quantify what types of songs tend to have longer chart dominance and provide insight into how well these features explain weeks-at-#1.
+We use a publicly available Billboard Hot 100 dataset (TidyTuesday, 1958–2025) combined with song-level audio and metadata features to build a regression model that predicts the number of weeks a song remains at the top of the charts (using a log1p transformation to address the strong right-skew in weeks-at-#1). Our linear regression model demonstrates weak predictive performance on unseen data (test RMSE ≈ 0.50 on the log scale; test R² ≈ 0.05), suggesting that the included musical and lyrical-topic features explain only a small portion of the variation in #1 longevity. At a high level, this implies that many drivers of long #1 runs likely depend on factors not captured in the dataset—such as marketing and promotion, artist popularity, streaming/radio dynamics, release timing, and competition in a given week. Despite limited predictive accuracy, the model highlights a few consistent associations with longer #1 runs, including lower energy, higher loudness, and higher overall rating.
 
 ## How to Run the Analysis
 
@@ -70,6 +70,6 @@ For the complete list of all pinned dependencies, see `renv.lock`.
 ## Licenses
 
 The software code in this project is licensed under the MIT License.  
-The written analysis and reports are licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (CC BY-NC-ND 4.0). 
+The written analysis and reports are licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (CC BY-NC-ND 4.0).
 
 See `LICENSE.md` for details.
