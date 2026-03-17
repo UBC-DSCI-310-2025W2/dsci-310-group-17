@@ -471,7 +471,7 @@ coef_data
 
 #### Result Interpretation
 
-The linear regression model shows weak predictive performance for explaining the number of weeks a song remains at number one on the Billboard chart. Cross-validation produced an average $R^2 = 0.063$ with `RMSE = 0.505` and `MAE = 0.415`, while evaluation on the test set yielded similar results ($R^2 = 0.063$, `RMSE = 0.505`, `MAE = 0.395`). The similarity between cross-validation and test metrics suggests that the model generalizes consistently and does not suffer from substantial overfitting. However, the low $R^2$ values indicate that the predictors explain only a small portion of the variation in chart longevity.
+The linear regression model shows weak predictive performance for explaining the number of weeks a song remains at number one on the Billboard chart. Cross-validation produced an average $R^2 = 0.063$ with `RMSE = 0.505` and `MAE = 0.415`, while evaluation on the test set yielded similar results ($R^2 = 0.052$, `RMSE = 0.502`, `MAE = 0.395`). The similarity between cross-validation and test metrics suggests that the model generalizes consistently and does not suffer from substantial overfitting. However, the low $R^2$ values indicate that the predictors explain only a small portion of the variation in chart longevity.
 
 The predicted versus actual plot further illustrates this limitation. Predictions tend to cluster around relatively low values regardless of the true outcome, indicating that the model struggles to capture songs that remain at number one for longer periods. Instead the prediction gravitate toward the average, suggesting the model is unable to identify strong signals that distinguish highly successful songs from others.
 
