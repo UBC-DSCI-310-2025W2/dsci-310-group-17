@@ -22,28 +22,21 @@ We use a publicly available Billboard Hot 100 dataset (TidyTuesday, 1958–2025)
    cd dsci-310-group-17
    ```
 
-2. Build the Docker image:
+2. Start the container:
 
    ```bash
-   docker build -t billboard-analysis .
+   docker compose up
    ```
 
-3. Run the container:
+3. Open <http://localhost:8787> in your browser (no password required).
+
+4. In the RStudio file pane, open `billboard_number_one_prediction.Rmd` and knit the document (**Knit → Knit to HTML**) or run all chunks.
+
+5. When done, stop the container with:
 
    ```bash
-   docker run -p 8787:8787 \
-       -e PASSWORD=billboard \
-       -v "$(pwd)":/home/rstudio/project \
-       billboard-analysis
+   docker compose down
    ```
-
-4. Open <http://localhost:8787> in your browser.
-
-5. Log in with:
-   - **Username:** `rstudio`
-   - **Password:** `billboard`
-
-6. In the RStudio file pane, open `billboard_number_one_prediction.Rmd` and knit the document (**Knit → Knit to HTML**) or run all chunks.
 
 ## Dependencies
 
