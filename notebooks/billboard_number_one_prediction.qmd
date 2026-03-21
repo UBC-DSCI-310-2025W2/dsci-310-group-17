@@ -36,31 +36,24 @@ The Billboard Hot 100 dataset provides us with two datasets: `billboard.csv`, wh
 
 Summary statistics for the target and key predictors:
 
-:::: {.quarto-table #tbl-summary-stats}
-![](../results/tables/summary_stats.csv)
-Table: Summary statistics for target and key predictors.
-::::
+```{r}
+knitr::kable(read.csv("../results/tables/summary_stats.csv"), caption = "Table 1: Summary statistics for target and key predictors.")
+```
 
 Distribution of weeks at number one:
 
-:::: {.quarto-figure #fig-weeks-dist}
-![](../results/figures/weeks_at_number_one_dist.png)
-Distribution of weeks at number one.
-::::
+![](../results/figures/target_distribution.png)
+*Figure 1: Distribution of weeks at number one.*
 
 Distributions of the five Spotify audio features:
 
-:::: {.quarto-figure #fig-audio-dist}
-![](../results/figures/spotify_audio_features_dist.png)
-Distributions of the five Spotify audio features.
-::::
+![](../results/figures/audio_feature_distribution.png)
+*Figure 2: Distributions of the five Spotify audio features.*
 
 Average weeks at number one by genre:
 
-:::: {.quarto-figure #fig-genre}
-![](../results/figures/genre_weeks_at_number_one.png)
-Average weeks at number one by genre.
-::::
+![](../results/figures/average_week.png)
+*Figure 3: Average weeks at number one by genre.*
 
 ## Feature Transformations & Selection
 
@@ -78,29 +71,23 @@ Average weeks at number one by genre.
 
 ## Results
 
-:::: {.quarto-table #tbl-cv-metrics}
-![](../results/tables/cv_metrics.csv)
-Table: Cross-validation metrics (RMSE, $R^2$, MAE).
-::::
+```{r}
+knitr::kable(read.csv("../results/tables/cv_metrics.csv"), caption = "Table 2: Cross-validation metrics (RMSE, R^2, MAE).")
+```
 
-:::: {.quarto-table #tbl-test-metrics}
-![](../results/tables/test_metrics.csv)
-Table: Test set metrics (RMSE, $R^2$, MAE).
-::::
+```{r}
+knitr::kable(read.csv("../results/tables/test_metrics.csv"), caption = "Table 3: Test set metrics (RMSE, R^2, MAE).")
+```
 
 Actual vs predicted weeks at number one (test set):
 
-:::: {.quarto-figure #fig-actual-vs-predicted}
 ![](../results/figures/actual_vs_predicted.png)
-Actual vs predicted weeks at number one on the test set (original scale).
-::::
+*Figure 4: Actual vs predicted weeks at number one on the test set (original scale).*
 
 Top 15 predictors by standardized coefficient magnitude:
 
-:::: {.quarto-figure #fig-top-coefficients}
 ![](../results/figures/top_15_coefficients.png)
-Top 15 predictors by standardized coefficient magnitude.
-::::
+*Figure 5: Top 15 predictors by standardized coefficient magnitude.*
 
 ## Result Interpretation
 
