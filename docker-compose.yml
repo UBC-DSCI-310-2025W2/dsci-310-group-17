@@ -5,5 +5,7 @@ services:
       - "8787:8787"
     environment:
       - DISABLE_AUTH=true
+      - WORKING_DIR=/home/rstudio/project
     volumes:
       - .:/home/rstudio/project
+    working_dir: /home/rstudio/project
