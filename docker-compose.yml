@@ -7,3 +7,7 @@ services:
       - DISABLE_AUTH=true
     volumes:
       - .:/home/rstudio/project
+      - renv_lib:/home/rstudio/project/renv/library
+
+volumes:
+  renv_lib:
