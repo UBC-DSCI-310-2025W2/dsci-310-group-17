@@ -1,4 +1,19 @@
-FROM --platform=linux/amd64 rocker/verse:4.5.2
+FROM --platform=linux/amd64 rocker/rstudio:4.5.2
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libxml2-dev \
+    libfontconfig1-dev \
+    libfreetype6-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
+    libpng-dev \
+    libtiff-dev \
+    libjpeg-dev \
+    libwebp-dev \
+    zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /home/rstudio/project
 
@@ -7,5 +22,8 @@ COPY renv/activate.R renv/activate.R
 
 RUN Rscript -e "install.packages('renv', repos = 'https://packagemanager.posit.co/cran/2026-03-07')" && \
     Rscript -e "options(repos = c(CRAN = 'https://packagemanager.posit.co/cran/__linux__/jammy/2026-03-07')); renv::restore()"
+RUN Rscript -e "tinytex::install_tinytex()"
 
 COPY . .
+
+RUN chown -R rstudio:rstudio /home/rstudio/project
