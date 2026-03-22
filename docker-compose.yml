@@ -5,9 +5,6 @@ services:
       - "8787:8787"
     environment:
       - DISABLE_AUTH=true
+      - RENV_PATHS_LIBRARY=/home/rstudio/renv-library
     volumes:
       - .:/home/rstudio/project
-      - renv_lib:/home/rstudio/project/renv/library
-
-volumes:
-  renv_lib:

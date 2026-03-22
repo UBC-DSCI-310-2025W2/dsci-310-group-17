@@ -5,7 +5,11 @@ WORKDIR /home/rstudio/project
 COPY renv.lock .Rprofile ./
 COPY renv/activate.R renv/activate.R
 
-RUN chown -R rstudio:rstudio /home/rstudio/project
+RUN chown -R rstudio:rstudio /home/rstudio/project && \
+    mkdir -p /home/rstudio/renv-library && \
+    chown -R rstudio:rstudio /home/rstudio/renv-library
+
+ENV RENV_PATHS_LIBRARY=/home/rstudio/renv-library
 
 USER rstudio
 
