@@ -2,7 +2,7 @@ services:
   rstudio:
     image: ruk2712/dsci-310-group-17:latest
     ports:
-      - "8787:8787"
+      - '8787:8787'
     environment:
       - DISABLE_AUTH=true
     volumes:
