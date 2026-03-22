@@ -5,6 +5,6 @@ services:
       - "8787:8787"
     environment:
       - DISABLE_AUTH=true
-      - RENV_CONFIG_AUTOLOAD_ENABLED=FALSE
+      - RENV_PATHS_LIBRARY=/home/rstudio/renv-library
     volumes:
       - .:/home/rstudio/project
