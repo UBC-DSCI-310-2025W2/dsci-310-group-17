@@ -18,9 +18,8 @@ all: data/raw/billboard.csv \
 	results/figures/average_week.png \
 	results/figures/target_distribution.png \
 	results/figures/top_15_coefficients.png \
-	notebooks/billboard_number_one_predicton.html \
-	notebooks/billboard_number_one_prediction.pdf \
-	notebooks/billboard_number_one_prediction.qmd
+	notebooks/billboard_number_one_prediction.html \
+	notebooks/billboard_number_one_prediction.pdf 
 
 
 
@@ -31,8 +30,7 @@ clean:
 	results/figures/*.png \
 	results/tables/*.csv \
 	notebooks/*.html \
-	notebooks/*.pdf \
-	notebooks/*.qmd
+	notebooks/*.pdf 
 
 #Generating data for report 
 data/raw/billboard.csv \
@@ -72,7 +70,7 @@ scripts/04_model_and_results.R
 
 #quarto file 
 render: 
-	quarto to render notebooks/billboard_number_one_prediction.qmd
+	quarto render notebooks/billboard_number_one_prediction.qmd
 
 #PDF 
 notebooks/billboard_number_one_prediction.pdf: results notebooks/billboard_number_one_prediction.qmd
