@@ -1,5 +1,4 @@
 library(docopt)
-library(tidytuesdayR)
 library(readr)
 
 doc <- "
@@ -22,9 +21,12 @@ dir.create(dirname(out_topics),    recursive = TRUE, showWarnings = FALSE)
 
 # Load the TidyTuesday data
 message("Downloading TidyTuesday data...")
-tuesdata <- tidytuesdayR::tt_load(2025, week = 34)
-billboard <- tuesdata$billboard
-topics <- tuesdata$topics
+billboard <- read_csv(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-08-26/billboard.csv"
+)
+topics <- read_csv(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-08-26/topics.csv"
+)
 
 # Save raw datasets
 write_csv(billboard, out_billboard)

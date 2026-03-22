@@ -41,7 +41,6 @@ The Billboard Hot 100 dataset provides us with two datasets: `billboard.csv`, wh
 
 ```{r load-libraries, warning=FALSE, message = FALSE}
 library(tidyverse)
-library(tidytuesdayR)
 library(knitr)
 library(dplyr)
 library(caret)
@@ -66,11 +65,13 @@ set.seed(123)
 -   All remaining character columns were converted to factors using `as.factor()`, and rows with any missing values were dropped with `drop_na()`.
 
 ```{r load-data}
-# Load the dataset
-tuesdata <- tidytuesdayR::tt_load(2025, week = 34)
 # Extract the datasets
-billboard <- tuesdata$billboard
-topics <- tuesdata$topics
+billboard <- read_csv(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-08-26/billboard.csv"
+)
+topics <- read_csv(
+  "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-08-26/topics.csv"
+)
 ```
 
 ```{r join-data}
