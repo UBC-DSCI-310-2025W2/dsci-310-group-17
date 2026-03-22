@@ -17,18 +17,27 @@ all: data/raw/billboard.csv \
 	results/figures/audio_feature_distribution.png \
 	results/figures/average_week.png \
 	results/figures/target_distribution.png \
-	results/figures/top_15_coefficients.png
+	results/figures/top_15_coefficients.png \
+	notebooks/billboard_number_one_predicton.html \
+	notebooks/billboard_number_one_prediction.pdf \
+	notebooks/billboard_number_one_prediction.qmd
 
 
 
 #Cleaning the Makefile
 clean: 
-	rm data/raw/*.csv data/processed/*.csv results/figures/*.png results/tables/*.csv
+	rm data/raw/*.csv \
+	data/processed/*.csv \
+	results/figures/*.png \
+	results/tables/*.csv \
+	notebooks/*.html \
+	notebooks/*.pdf \
+	notebooks/*.qmd
 
 #Generating data for report 
 data/raw/billboard.csv \
-data/raw/topics.csv: scripts/01_downloading_data.R
-	Rscript scripts/01_downloading_data.R
+data/raw/topics.csv: scripts/01_download_data.R
+	Rscript scripts/01_download_data.R
 
 #Preprocessing data 
 data/processed/billboard_model_eda.csv \
@@ -58,5 +67,18 @@ data/processed/billboard_model_testing.csv \
 scripts/04_model_and_results.R
 	Rscript scripts/04_model_and_results.R
 
-#Building the quarto file for the report
+
+#Building the quarto file, PDF, and HTML for the report
+
+#quarto file 
+render: 
+	quarto to render notebooks/billboard_number_one_prediction.qmd
+
+#PDF 
+notebooks/billboard_number_one_prediction.pdf: results notebooks/billboard_number_one_prediction.qmd
+	quarto render notebooks/billboard_number_one_prediction.qmd --to pdf
+
+#HTML
+notebooks/billboard_number_one_prediction.html: results notebooks/billboard_number_one_prediction.qmd
+	quarto render notebooks/billboard_number_one_prediction.qmd --to html
 
