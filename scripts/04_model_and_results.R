@@ -2,6 +2,9 @@ library(docopt)
 library(tidyverse)
 library(tidymodels)
 library(readr)
+library(here)
+
+source(here::here("R/extract_top_coefficients.R"))
 
 doc <- "
 Usage:
@@ -140,14 +143,7 @@ message("Saved results plot comparing actual and predicted target values plot to
 # Result figure 2: Top 15 predictors by coefficient magnitude
 message("Plotting top 15 coefficients...")
 
-coef_data <- broom::tidy(extract_fit_engine(final_fit)) |>
-  filter(term != "(Intercept)") |>
-  arrange(desc(abs(estimate))) |>
-  slice_head(n = 15) |>
-  mutate(
-    direction = if_else(estimate > 0, "Positive", "Negative"),
-    term      = str_replace_all(term, "_", " ") |> str_to_title()
-  )
+coef_data <- extract_top_coefficients(extract_fit_engine(final_fit), n = 15)
 
 p_coefficients <- ggplot(
   coef_data,
