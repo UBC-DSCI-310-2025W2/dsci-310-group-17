@@ -1,5 +1,6 @@
 library(docopt)
 library(readr)
+source("R/load_data.R")
 
 doc <- "
 Usage:
@@ -21,10 +22,10 @@ dir.create(dirname(out_topics),    recursive = TRUE, showWarnings = FALSE)
 
 # Load the TidyTuesday data
 message("Downloading TidyTuesday data...")
-billboard <- read_csv(
+billboard <- load_data(
   "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-08-26/billboard.csv"
 )
-topics <- read_csv(
+topics <- load_data(
   "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-08-26/topics.csv"
 )
 
