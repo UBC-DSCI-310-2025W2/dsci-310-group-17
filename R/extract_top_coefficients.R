@@ -17,15 +17,17 @@
 #' - `estimate`: Standardized coefficient value
 #' - `direction`: "Positive" if estimate > 0, else "Negative"
 #' 
-#' @example 
+#' @examples
 #' # After fitting the model:
-#' coef <- extract_top_coefficients(extract_fit_engine(final_fit)) # For default n
-#' coef <- extract_top_coefficients(extract_fit_engine(final_fit), n = 10) # For n = 10
+#' # Using the default n = 15:
+#' coef <- extract_top_coefficients(extract_fit_engine(final_fit)) 
+#' # Using the custom n:
+#' coef <- extract_top_coefficients(extract_fit_engine(final_fit), n = 10) 
 #' 
 #' @export
-
 extract_top_coefficients <- function(fit, n = 15) {
-  if (!is.numeric(n) || length(n) != 1 || n < 1) {
+  if (is.null(n) || !is.numeric(n) || length(n) != 1 || 
+      is.nan(n) || !is.finite(n) || n < 1 || n != floor(n)) {
     stop("`n` must be a single positive integer.")
   }
   
