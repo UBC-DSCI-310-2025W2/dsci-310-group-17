@@ -57,6 +57,8 @@ Key dependencies include:
 | MASS        | 7.3-65  |
 | Matrix      | 1.7-4   |
 | Rcpp        | 1.1.0   |
+| testthat    | 3.3.2   |
+| here        | 1.0.2   |
 
 For the complete list of all pinned dependencies, see `renv.lock`.
 
