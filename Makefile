@@ -3,24 +3,7 @@
 .PHONY: all clean
 
 #Run all command for makefile
-all: data/raw/billboard.csv \
-	data/raw/topics.csv \
-	data/processed/billboard_model_eda.csv \
-	data/processed/billboard_model_selected.csv \
-	data/processed/billboard_model_testing.csv \
-	data/processed/billboard_model_training.csv \
-	results/tables/summary_stats.csv \
-	results/tables/cv_metrics.csv \
-	results/tables/test_metrics.csv \
-	results/tables/top_15_coefficients.csv \
-	results/figures/actual_vs_predicted.png \
-	results/figures/audio_feature_distribution.png \
-	results/figures/average_week.png \
-	results/figures/target_distribution.png \
-	results/figures/top_15_coefficients.png \
-	notebooks/billboard_number_one_prediction.html \
-	notebooks/billboard_number_one_prediction.pdf 
-
+all: notebooks/billboard_number_one_prediction.html
 
 
 #Cleaning the Makefile
