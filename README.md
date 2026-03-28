@@ -15,6 +15,12 @@ We use a publicly available Billboard Hot 100 dataset (TidyTuesday, 1958–2025)
 
 ## How to Run the Analysis
 
+### Prerequisites
+
+- [Docker Desktop](https://docs.docker.com/get-docker/) installed and running
+
+### Steps
+
 1. Clone this repository:
 
    ```bash
@@ -22,21 +28,120 @@ We use a publicly available Billboard Hot 100 dataset (TidyTuesday, 1958–2025)
    cd dsci-310-group-17
    ```
 
-2. Start the container:
+2. Start the container using the pinned image tag:
+
+   ```bash
+   IMAGE_TAG=sha-13c80a2 docker compose up
+   ```
+
+   This:
+   - Uses image `ruk2712/dsci-310-group-17:sha-13c80a2` (pinned to this project's latest release)
+   - Maps port **8787** on your machine to RStudio Server inside the container
+   - Mounts the current directory into `/home/rstudio/project` inside the container
+
+   > **Alternative tags:** All available image tags (including newer releases) are listed on [Docker Hub](https://hub.docker.com/r/ruk2712/dsci-310-group-17/tags). To use a different version, replace `sha-13c80a2` with any tag from that page, e.g.:
+   > ```bash
+   > IMAGE_TAG=sha-6d85eab docker compose up
+   > ```
+   > You can also omit `IMAGE_TAG` entirely to use `latest`, though this may not be reproducible.
+
+3. Open <http://localhost:8787> in your browser (no password required).
+
+4. In the RStudio **Terminal** tab, run the full analysis pipeline:
+
+   ```bash
+   make all
+   ```
+
+   This runs the following steps in order:
+   | Step | Script | Output |
+   |------|--------|--------|
+   | Download data | `scripts/01_download_data.R` | `data/raw/` |
+   | Preprocess data | `scripts/02_preprocess_data.R` | `data/processed/` |
+   | EDA | `scripts/03_eda.R` | `results/figures/`, `results/tables/` |
+   | Model & results | `scripts/04_model_and_results.R` | `results/figures/`, `results/tables/` |
+   | Render report | `notebooks/billboard_number_one_prediction.qmd` | `notebooks/billboard_number_one_prediction.html` |
+
+   To also render the **PDF** version of the report:
+
+   ```bash
+   make notebooks/billboard_number_one_prediction.pdf
+   ```
+
+5. To remove all generated files and start fresh:
+
+   ```bash
+   make clean
+   ```
+
+6. When done, stop and remove the container:
+
+   ```bash
+   docker compose down
+   ```
+
+## Adding a New Dependency
+
+This project uses `renv` to manage R package dependencies and Docker to ensure a reproducible environment. Follow these steps when adding a new R package:
+
+1. Create a new branch:
+
+   ```bash
+   git checkout -b add-<package-name>-dependency
+   ```
+
+2. Start the container and open RStudio at <http://localhost:8787>:
 
    ```bash
    docker compose up
    ```
 
-3. Open <http://localhost:8787> in your browser (no password required).
+3. Install the package inside the container's RStudio **Console**:
 
-4. In the RStudio file pane, open `billboard_number_one_prediction.Rmd` and knit the document (**Knit → Knit to HTML**) or run all chunks.
+   ```r
+   install.packages("<package-name>")
+   ```
 
-5. When done, stop the container with:
+4. Snapshot the new package into `renv.lock`:
+
+   ```r
+   renv::snapshot()
+   ```
+
+5. Add the package to the `Dockerfile` if it requires any system-level libraries (add an `apt-get install` line under the existing `RUN apt-get` block).
+
+6. Commit both `renv.lock` and (if changed) `Dockerfile`, then push the branch. The GitHub Actions workflow will automatically build and push a new Docker image tagged with the commit SHA.
+
+7. Pin to the new SHA tag by setting `IMAGE_TAG` when starting the container. The exact tag (formatted as `sha-<7-char-sha>`) is shown in the GitHub Actions run logs and on [Docker Hub](https://hub.docker.com/r/ruk2712/dsci-310-group-17/tags):
 
    ```bash
-   docker compose down
+   IMAGE_TAG=sha-<your-new-sha> docker compose up
    ```
+
+8. Open a pull request to merge the changes into `main`.
+
+## Running the Tests
+
+Tests are written with [`testthat`](https://testthat.r-lib.org/) and cover the four core utility functions in `R/`:
+
+| Test file | Functions tested |
+|-----------|-----------------|
+| `tests/testthat/test-eda_utils.R` | `compute_summary_stats` |
+| `tests/testthat/test-extract_top_coefficients.R` | `extract_top_coefficients()` |
+| `tests/testthat/test-load_data.R` | `load_data()` |
+| `tests/testthat/test-preprocess_utils.R` | `clean_and_join_billboard()` |
+
+To run all tests, open the RStudio **Terminal** inside the running container and execute:
+
+```bash
+Rscript -e "testthat::test_dir('tests/testthat')"
+```
+
+Or run a single test file:
+
+```bash
+Rscript -e "testthat::test_file('tests/testthat/test-load_data.R')"
+```
 
 ## Dependencies
 
