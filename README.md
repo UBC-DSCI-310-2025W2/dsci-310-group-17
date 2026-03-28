@@ -44,21 +44,21 @@ This project uses R 4.5.2 and manages package dependencies with `renv`. All pack
 
 Key dependencies include:
 
-| Package     | Version |
-|-------------|---------|
-| R           | 4.5.2   |
-| tidyverse   | 2.0.0   |
-| ggplot2     | 4.0.1   |
-| dplyr       | 1.1.4   |
-| readr       | 2.1.6   |
-| knitr       | 1.50    |
-| caret       | 7.0-1   |
-| broom       | 1.0.10  |
-| MASS        | 7.3-65  |
-| Matrix      | 1.7-4   |
-| Rcpp        | 1.1.0   |
-| testthat    | 3.3.2   |
-| here        | 1.0.2   |
+| Package     | Version      |
+|-------------|--------------|
+| R           | 4.5.2        |
+| tidyverse   | 2.0.0        |
+| ggplot2     | 4.0.2        |
+| dplyr       | 1.2.0        |
+| readr       | 2.2.0        |
+| knitr       | 1.51         |
+| caret       | 7.0-1        |
+| broom       | 1.0.12       |
+| tidymodels  | 1.4.1        |
+| tibble      | 3.3.1        |
+| docopt      | 0.7.2        |
+| testthat    | 3.3.2        |
+| here        | 1.0.2        |
 
 For the complete list of all pinned dependencies, see `renv.lock`.
 
