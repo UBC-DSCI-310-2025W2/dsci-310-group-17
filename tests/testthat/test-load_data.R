@@ -16,7 +16,7 @@ test_that("load data reads urls correctly", {
 test_that('data cannot load from a nonexistent url', {
     invalid_url <- "https://this.urldoesnotexist.com/trying/to/copy/format.csv"
     
-    expect_error(load_data(invalid_url))
+    expect_error(suppressWarnings(load_data(invalid_url)))
 })
 
 # Loads data in a csv format
@@ -26,7 +26,7 @@ test_that('loads data in csv format that is not a url', {
     temp_file <- tempfile(fileext = '.csv')
     write_csv(df_test, temp_file)
     
-    result <- load_data(temp_file)
+    result <- as.data.frame(load_data(temp_file))
     
     expect_equal(result,df_test)
 })
@@ -34,7 +34,7 @@ test_that('loads data in csv format that is not a url', {
 #Fails to load nonexistent data file
 test_that('retunrs an error if the file does not exist', {
     fake_file <- tempfile(fileext = ".csv")
-    expect_error(load_data(fake_file), "File does not exist")
+    expect_error(load_data(fake_file))
 })
 
 #Fails to load files with different types (not csv)

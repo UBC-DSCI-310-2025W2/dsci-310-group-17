@@ -11,5 +11,12 @@
 #' @export
 
 load_data<-function(path) {
+    if (grepl("^https?://", path)){
+        readr::read_csv(path)
+    } else {
+    if (tolower(tools::file_ext(path)) != "csv") {
+        stop("Invalid file type")
+    }
     readr::read_csv(path)
+    }
 }
