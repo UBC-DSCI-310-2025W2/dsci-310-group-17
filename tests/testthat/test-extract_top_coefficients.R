@@ -1,8 +1,8 @@
 library(testthat)
 library(dplyr)
 library(tibble)
+library(broom)
 library(here)
-
 source(here::here("R/extract_top_coefficients.R"))
 
 # Make a fake data model
@@ -40,26 +40,42 @@ test_that("n as NULL throws an error", {
   expect_error(extract_top_coefficients(mock_lm, n = NULL))
 })
 
-## Checking fit
-test_that("fit without estimate columns", {
-  bad_input <- list(a = 1, b = 2)
-  expect_error(extract_top_coefficients(bad_input))
+test_that("n as a non-integer numeric (e.g. 2.7) throws an error", {
+  expect_error(extract_top_coefficients(mock_lm, n = 2.7))
 })
 
-test_that("non-model object throws an error", {
-  expect_error(extract_top_coefficients("not_a_model"))
+test_that("n as Inf throws an error", {
+  expect_error(extract_top_coefficients(mock_lm, n = Inf))
+})
+
+test_that("n as NaN throws an error", {
+  expect_error(extract_top_coefficients(mock_lm, n = NaN))
+})
+
+## Checking fit
+test_that("fit without term/estimate columns, throws an error", {
+  expect_error(extract_top_coefficients("not a model"))
+})
+
+test_that("plain list fit throws an error", {
+  expect_error(extract_top_coefficients(list(a=1,b=2)))
 })
 
 test_that("NULL fit throws an error", {
   expect_error(extract_top_coefficients(NULL))
 })
 
-# Checking output type
-test_that("function retruns a data frame", {
+# Simple use cases
+test_that("function works with default n (n = 15)", {
+  expect_no_error(extract_top_coefficients(mock_lm))
+})
+
+test_that("function works with explicit n = 4", {
   result <- extract_top_coefficients(mock_lm, n = 4)
   expect_true(is.data.frame(result))
 })
 
+# Checking output type
 test_that("result have all required columns", {
   result <- extract_top_coefficients(mock_lm, n = 4)
   expect_true(all(c("term", "estimate", "direction") %in% names(result)))
@@ -80,6 +96,7 @@ test_that("direction column in character type", {
   expect_type(result$direction, "character")
 })
 
+# Output content and correctness tests
 test_that("intercept is removed from output", {
   result <- extract_top_coefficients(mock_lm, n = 4)
   expect_false("(Intercept)" %in% result$term)
@@ -117,4 +134,15 @@ test_that("direction matches sign of estimate", {
     (result$estimate > 0 & result$direction == "Positive") |
       (result$estimate < 0 & result$direction == "Negative")
   ))
+})
+
+# Term formatting
+test_that("underscores in term names are replaced with spaces", {
+  result <- extract_top_coefficients(mock_lm, n = 5)
+  expect_false(any(grepl("_", result$term)))
+})
+
+test_that("term names are title-cased", {
+  result <- extract_top_coefficients(mock_lm, n = 5)
+  expect_true("Loud Factor" %in% result$term)
 })
