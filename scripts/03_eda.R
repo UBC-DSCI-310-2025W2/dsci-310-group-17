@@ -2,6 +2,7 @@ library(docopt)
 library(tidyverse)
 library(readr)
 library(knitr)
+source("R/eda_utils.R")
 
 doc <- "
 Usage:
@@ -26,22 +27,12 @@ billboard_clean <- read_csv(in_data, show_col_types = FALSE)
 
 # 1. Summary statistics table
 message("Computing summary statistics...")
-summary_stats <- billboard_clean |>
-  select(
-    weeks_at_number_one, overall_rating, bpm,
-    energy, danceability, happiness,
-    acousticness, loudness_d_b, front_person_age, length_sec
-  ) |>
-  pivot_longer(cols = everything(), names_to = "Variable") |>
-  group_by(Variable) |>
-  summarise(
-    Mean   = round(mean(value), 2),
-    SD     = round(sd(value), 2),
-    Min    = round(min(value), 2),
-    Median = round(median(value), 2),
-    Max    = round(max(value), 2),
-    .groups = "drop"
-  )
+summary_stats <- compute_summary_stats(
+  billboard_clean,
+  c("weeks_at_number_one", "overall_rating", "bpm",
+    "energy", "danceability", "happiness",
+    "acousticness", "loudness_d_b", "front_person_age", "length_sec")
+)
 
 write_csv(summary_stats, paste0(out_prefix_tables, "summary_stats.csv"))
 message("Saved summary statistics to: ", paste0(out_prefix_tables, "summary_stats.csv"))
