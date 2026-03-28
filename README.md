@@ -45,9 +45,9 @@ We use a publicly available Billboard Hot 100 dataset (TidyTuesday, 1958–2025)
    > ```
    > You can also omit `IMAGE_TAG` entirely to use `latest`, though this may not be reproducible.
 
-3. Open <http://localhost:8787> in your browser (no password required).
+3. Open <http://localhost:8787> in your browser (no password required) to access RStudio Server.
 
-4. In the RStudio **Terminal** tab, run the full analysis pipeline:
+4. In the RStudio **Terminal** tab, run the full analysis pipeline using the Makefile:
 
    ```bash
    make all
@@ -60,7 +60,7 @@ We use a publicly available Billboard Hot 100 dataset (TidyTuesday, 1958–2025)
    | Preprocess data | `scripts/02_preprocess_data.R` | `data/processed/` |
    | EDA | `scripts/03_eda.R` | `results/figures/`, `results/tables/` |
    | Model & results | `scripts/04_model_and_results.R` | `results/figures/`, `results/tables/` |
-   | Render report | `notebooks/billboard_number_one_prediction.qmd` | `notebooks/billboard_number_one_prediction.html` |
+   | Render report (HTML) | `notebooks/billboard_number_one_prediction.qmd` | `notebooks/billboard_number_one_prediction.html` |
 
    To also render the **PDF** version of the report:
 
@@ -68,13 +68,15 @@ We use a publicly available Billboard Hot 100 dataset (TidyTuesday, 1958–2025)
    make notebooks/billboard_number_one_prediction.pdf
    ```
 
+   > **Note:** The report is a Quarto document (`.qmd`). Do not use the RStudio Knit button — use the Makefile commands above instead.
+
 5. To remove all generated files and start fresh:
 
    ```bash
    make clean
    ```
 
-6. When done, stop and remove the container:
+6. When done, stop the container. In the terminal where `docker compose up` is running, press **Ctrl+C** to stop it, then run:
 
    ```bash
    docker compose down
