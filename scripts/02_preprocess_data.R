@@ -3,7 +3,7 @@ library(tidyverse)
 library(caret)
 library(readr)
 library(tidymodels)
-source("../R/preprocess_utils.R")
+source(here::here("R/preprocess_utils.R"))
 
 doc <- "
 Usage:
