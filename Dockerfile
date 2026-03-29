@@ -1,5 +1,8 @@
 FROM --platform=linux/amd64 rocker/rstudio:4.5.2
 
+ENV RENV_PATHS_LIBRARY=/home/rstudio/renv-library \
+    RENV_CONFIG_CACHE_ENABLED=FALSE
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libcurl4-openssl-dev \
     libssl-dev \
@@ -26,4 +29,5 @@ RUN Rscript -e "tinytex::install_tinytex()"
 
 COPY . .
 
-RUN chown -R rstudio:rstudio /home/rstudio/project
+RUN chown -R rstudio:rstudio /home/rstudio/project && \
+    chown -R rstudio:rstudio /home/rstudio/renv-library
