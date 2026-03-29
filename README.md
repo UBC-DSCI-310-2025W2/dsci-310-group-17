@@ -31,11 +31,11 @@ We use a publicly available Billboard Hot 100 dataset (TidyTuesday, 1958–2025)
 2. Start the container using the pinned image tag:
 
    ```bash
-   IMAGE_TAG=sha-13c80a2 docker compose up
+   IMAGE_TAG=sha-307ddb7 docker compose up
    ```
 
    This:
-   - Uses image `ruk2712/dsci-310-group-17:sha-13c80a2` (pinned to this project's latest release)
+   - Uses image `ruk2712/dsci-310-group-17:sha-307ddb7` (pinned to this project's latest release)
    - Maps port **8787** on your machine to RStudio Server inside the container
    - Mounts the current directory into `/home/rstudio/project` inside the container
 

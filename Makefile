@@ -30,11 +30,14 @@ scripts/02_preprocess_data.R
 	Rscript scripts/02_preprocess_data.R
 
 
+results:
+	mkdir -p results/figures results/tables
+
 #Conducting EDA and generating relevant plots for scripts
 results/tables/summary_stats.csv \
 results/figures/target_distribution.png \
 results/figures/audio_feature_distribution.png \
-results/figures/average_week.png: data/processed/billboard_model_eda.csv scripts/03_eda.R
+results/figures/average_week.png: results data/processed/billboard_model_eda.csv scripts/03_eda.R
 	Rscript scripts/03_eda.R
 
 #Generating Final model and explaining analysis results
@@ -43,6 +46,7 @@ results/tables/test_metrics.csv \
 results/tables/top_15_coefficients.csv \
 results/figures/actual_vs_predicted.png \
 results/figures/top_15_coefficients.png: \
+results \
 data/processed/billboard_model_training.csv \
 data/processed/billboard_model_testing.csv \
 scripts/04_model_and_results.R

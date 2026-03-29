@@ -50,3 +50,13 @@ rsconnect/
 
 # MacOS system file
 .DS_Store
+
+# Generated report outputs
+notebooks/*.html
+notebooks/*.pdf
+notebooks/*.log
+notebooks/*.tex
+notebooks/*_files/
+results/figures/
+results/tables/
+data/processed/
