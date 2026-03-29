@@ -7,8 +7,7 @@ source("../R/preprocess_utils.R")
 
 doc <- "
 Usage:
-  02_preprocess_data.R [--in_billboard=<path>] [--in_topics=<path>] 
-                       [--out_train=<path>] [--out_test=<path>] [--out_full=<path>] [--out_eda=<path>]
+  02_preprocess_data.R [--in_billboard=<path>] [--in_topics=<path>] [--out_train=<path>] [--out_test=<path>] [--out_full=<path>] [--out_eda=<path>]
                        
 Options:
   --in_billboard=<path> Path to raw billboard CSV [default: ../data/raw/billboard.csv]
