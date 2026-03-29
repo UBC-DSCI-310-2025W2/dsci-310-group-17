@@ -50,7 +50,7 @@ We use a publicly available Billboard Hot 100 dataset (TidyTuesday, 1958–2025)
 4. In the RStudio **Terminal** tab, run the full analysis pipeline using the Makefile:
 
    ```bash
-   cd projects
+   cd project
    make all
    ```
 
