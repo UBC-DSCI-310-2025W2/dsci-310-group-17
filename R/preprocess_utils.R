@@ -28,6 +28,7 @@ clean_and_join_billboard <- function(billboard_path, topics_path) {
     )) %>%
     dplyr::mutate(dplyr::across(where(is.character), as.factor)) %>%
     tidyr::drop_na()
+  if (nrow(cleaned) == 0) stop("No data remaining after cleaning and joining.")
   return(cleaned)
 }
 
