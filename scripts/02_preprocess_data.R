@@ -3,6 +3,7 @@ library(tidyverse)
 library(caret)
 library(readr)
 library(tidymodels)
+source("../R/preprocess_utils.R")
 
 doc <- "
 Usage:
@@ -34,82 +35,29 @@ dir.create(dirname(out_eda), recursive = TRUE, showWarnings = FALSE)
 
 set.seed(123)
 
-# Read data 
-billboard <- read_csv(in_billboard, show_col_types = FALSE)
-topics <- read_csv(in_topics, show_col_types = FALSE)
 
-# Join the two datasets
-billboard_joined <- billboard |>
-  left_join(topics, by = c("lyrical_topic" = "lyrical_topics"))
+# Use utility function for cleaning and joining
+billboard_clean <- clean_and_join_billboard(in_billboard, in_topics)
 
-# Data wrangling
-billboard_clean <- billboard_joined |>
-  # Remove identifier columns
-  select(-c(song, artist, date)) |>
-  # Remove data-leakage column
-  select(-non_consecutive) |>
-  # Remove individual judge scores to avoid multicollinearity
-  select(-c(rating_1, rating_2, rating_3)) |>
-  # Remove free-text columns
-  select(-c(
-    lyrics,
-    u_s_artwork,
-    sound_effects,
-    song_structure,
-    featured_artists,
-    songwriters,
-    songwriters_w_o_interpolation_sample_credits,
-    producers,
-    double_a_side,
-    talent_contestant
-  )) |>
-  # Remove high-cardinality columns
-  select(-c(label, parent_label, artist_place_of_origin)) |>
-  # Remove redundant columns and discogs_genre
-  select(-c(cdr_style, discogs_style, keys, discogs_genre)) |>
-  # Remove ambiguous columns
-  select(-c(
-    featured_in_a_then_contemporary_play,
-    featured_in_a_then_contemporary_film,
-    featured_in_a_then_contemporary_t_v_show
-  )) |>
-  # Convert remaining character columns to factors
-  mutate(across(where(is.character), as.factor)) |>
-  drop_na()
 
 # Save the EDA dataset
 write_csv(billboard_clean, out_eda)
 message("Saved EDA dataset:", out_eda)
 
-# Log transform
-billboard_log_transformed <- billboard_clean |> 
-  mutate(
-    log_weeks_at_number_one = log1p(weeks_at_number_one),
-    log_acousticness = log1p(acousticness)
-  )
 
-# One-hot encoding 
-billboard_genres <- billboard_log_transformed |> 
-  separate_rows(cdr_genre, sep = ";") |> 
-  mutate (cdr_genre = str_trim(cdr_genre))
+# Log transform using utility function
+billboard_log_transformed <- log_transform_columns(
+  billboard_clean,
+  c("weeks_at_number_one", "acousticness")
+)
 
-billboard_genres_wide <- billboard_genres |> 
-  mutate(value = 1) |> 
-  pivot_wider(
-    names_from = cdr_genre, 
-    values_from = value,
-    values_fill = 0
-  )
 
-# Simplify key
-billboard_simplify_key <- billboard_genres_wide |> 
-  mutate(
-    simplified_key = case_when(
-      simplified_key == "Multiple Keys"          ~ "Multiple Keys",
-      str_ends(simplified_key, "m")              ~ "Minor",  
-      TRUE                                        ~ "Major"  
-    ) |> as.factor()
-  )
+# One-hot encoding using utility function
+billboard_genres_wide <- one_hot_encode_genre(billboard_log_transformed)
+
+
+# Simplify key using utility function
+billboard_simplify_key <- simplify_key_column(billboard_genres_wide)
 
 billboard_model_final <- billboard_simplify_key |> 
   select(-weeks_at_number_one, -acousticness)
