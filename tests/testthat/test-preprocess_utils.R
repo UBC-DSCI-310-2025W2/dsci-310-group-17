@@ -118,3 +118,41 @@ test_that("simplify_key_column: normal, edge, and error cases", {
   # Wrong input: missing simplified_key
   expect_error(simplify_key_column(data.frame(x = 1)))
 })
+
+test_that("extract_genre_levels and split preprocessing use training-only state", {
+  train_df <- data.frame(
+    weeks_at_number_one = c(1, 2, 3, 4),
+    acousticness = c(0.1, 0.2, 0.3, 0.4),
+    simplified_key = c("C", "Am", "G", "F"),
+    cdr_genre = c("Pop;Rock", "Pop", "Rock", "Pop"),
+    keep_me = c(1, 2, 3, 4),
+    train_constant = 1,
+    drop_me = c("x", "x", "x", "x"),
+    stringsAsFactors = FALSE
+  )
+
+  test_df <- data.frame(
+    weeks_at_number_one = c(5, 6),
+    acousticness = c(0.5, 0.6),
+    simplified_key = c("C", "Dm"),
+    cdr_genre = c("Jazz;Pop", "Jazz"),
+    keep_me = c(5, 6),
+    train_constant = c(7, 8),
+    drop_me = c("y", "y"),
+    stringsAsFactors = FALSE
+  )
+
+  expect_equal(extract_genre_levels(train_df), c("Pop", "Rock"))
+
+  preprocessed <- preprocess_billboard_split(train_df, test_df, c("drop_me"))
+
+  expect_true(identical(names(preprocessed$train), names(preprocessed$test)))
+  expect_true(all(c("log_weeks_at_number_one", "log_acousticness") %in% names(preprocessed$train)))
+  expect_false("cdr_genre" %in% names(preprocessed$train))
+  expect_false("Jazz" %in% names(preprocessed$train))
+  expect_false("Jazz" %in% names(preprocessed$test))
+  expect_false("train_constant" %in% names(preprocessed$train))
+  expect_false("train_constant" %in% names(preprocessed$test))
+  expect_false("drop_me" %in% names(preprocessed$train))
+  expect_false("drop_me" %in% names(preprocessed$test))
+})

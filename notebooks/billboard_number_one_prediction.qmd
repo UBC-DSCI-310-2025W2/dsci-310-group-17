@@ -8,7 +8,28 @@ format:
     toc-title: "Table of Contents"
     number-sections: true
 bibliography: references.bib
+execute:
+  echo: false
 ---
+
+```{r setup}
+summary_stats <- readr::read_csv("../results/tables/summary_stats.csv", show_col_types = FALSE)
+cv_metrics <- readr::read_csv("../results/tables/cv_metrics.csv", show_col_types = FALSE)
+test_metrics <- readr::read_csv("../results/tables/test_metrics.csv", show_col_types = FALSE)
+coef_data <- readr::read_csv("../results/tables/top_15_coefficients.csv", show_col_types = FALSE)
+
+cv_rmse <- cv_metrics |> dplyr::filter(.metric == "rmse") |> dplyr::pull(mean)
+cv_rsq <- cv_metrics |> dplyr::filter(.metric == "rsq") |> dplyr::pull(mean)
+cv_mae <- cv_metrics |> dplyr::filter(.metric == "mae") |> dplyr::pull(mean)
+
+test_rmse <- test_metrics |> dplyr::filter(.metric == "rmse") |> dplyr::pull(.estimate)
+test_rsq <- test_metrics |> dplyr::filter(.metric == "rsq") |> dplyr::pull(.estimate)
+test_mae <- test_metrics |> dplyr::filter(.metric == "mae") |> dplyr::pull(.estimate)
+
+energy_beta <- coef_data |> dplyr::filter(term == "energy") |> dplyr::pull(estimate)
+loudness_beta <- coef_data |> dplyr::filter(term == "loudness_d_b") |> dplyr::pull(estimate)
+rating_beta <- coef_data |> dplyr::filter(term == "overall_rating") |> dplyr::pull(estimate)
+```
 
 # Summary
 
@@ -28,7 +49,7 @@ The Billboard Hot 100 dataset provides us with two datasets: `billboard.csv`, wh
 
 1. **Reading & Wrangling:** Read and wrangle the dataset into one tidy combined dataset.
 2. **Exploratory Data Analysis:** Explore the data to understand the distribution of features and their relationships with the target variable.
-3. **Feature Transformations & Selection:** Apply log transformation to skewed variables, one-hot encode `cdr_genre`, and collapse `simplified_key` into three categories. Drop irrelevant columns and use near-zero variance filtering.
+3. **Feature Transformations & Selection:** Split the cleaned data first, then learn log transformations, one-hot encoding, and near-zero variance filtering from the training split only before applying the same transformations to the test split. This avoids leaking test-set information into feature selection.
 4. **Model Building & Evaluation:** Split the data 70/30, fit an ordinary least squares model using a `tidymodels` workflow. Evaluate the model using repeated 5-fold cross-validation and test set metrics (RMSE, $R^2$, MAE).
 5. **Results and Conclusion:** Summarize findings, discuss implications, and suggest potential future work.
 
@@ -36,32 +57,39 @@ The Billboard Hot 100 dataset provides us with two datasets: `billboard.csv`, wh
 
 Summary statistics for the target and key predictors:
 
-```{r}
-knitr::kable(read.csv("../results/tables/summary_stats.csv"), caption = "Table 1: Summary statistics for target and key predictors.")
+```{r summary-stats}
+#| tbl-cap: "Summary statistics for target and key predictors."
+knitr::kable(summary_stats)
 ```
 
 Distribution of weeks at number one:
 
-![](../results/figures/target_distribution.png)
-*Figure 1: Distribution of weeks at number one.*
+```{r target-distribution}
+#| fig-cap: "Distribution of weeks at number one."
+knitr::include_graphics("../results/figures/target_distribution.png")
+```
 
 Distributions of the five Spotify audio features:
 
-![](../results/figures/audio_feature_distribution.png)
-*Figure 2: Distributions of the five Spotify audio features.*
+```{r audio-feature-distribution}
+#| fig-cap: "Distributions of the five Spotify audio features."
+knitr::include_graphics("../results/figures/audio_feature_distribution.png")
+```
 
 Average weeks at number one by genre:
 
-![](../results/figures/average_week.png)
-*Figure 3: Average weeks at number one by genre.*
+```{r average-week-by-genre}
+#| fig-cap: "Average weeks at number one by genre."
+knitr::include_graphics("../results/figures/average_week.png")
+```
 
 ## Feature Transformations & Selection
 
 - Log transformation applied to right-skewed variables (`weeks_at_number_one`, `acousticness`).
 - One-hot encoding for multi-label genres.
 - Collapsed musical keys into Major, Minor, and Multiple Keys.
-- Dropped redundant, high-cardinality, and ambiguous columns.
-- Removed near-zero variance predictors.
+- Dropped redundant, high-cardinality, and ambiguous columns after the train/test split, using domain knowledge to remove identifiers, duplicate metadata, sparse content indicators, and weakly interpretable variables.
+- Removed near-zero variance predictors using the training split only, then applied the same exclusion set to the test split.
 
 ## Modeling
 
@@ -71,37 +99,43 @@ Average weeks at number one by genre:
 
 ## Results
 
-```{r}
-knitr::kable(read.csv("../results/tables/cv_metrics.csv"), caption = "Table 2: Cross-validation metrics (RMSE, R^2, MAE).")
+```{r cv-metrics}
+#| tbl-cap: "Cross-validation metrics (RMSE, R^2, MAE)."
+knitr::kable(cv_metrics)
 ```
 
-```{r}
-knitr::kable(read.csv("../results/tables/test_metrics.csv"), caption = "Table 3: Test set metrics (RMSE, R^2, MAE).")
+```{r test-metrics}
+#| tbl-cap: "Test set metrics (RMSE, R^2, MAE)."
+knitr::kable(test_metrics)
 ```
 
 Actual vs predicted weeks at number one (test set):
 
-![](../results/figures/actual_vs_predicted.png)
-*Figure 4: Actual vs predicted weeks at number one on the test set (original scale).*
+```{r actual-vs-predicted}
+#| fig-cap: "Actual vs predicted weeks at number one on the test set (original scale)."
+knitr::include_graphics("../results/figures/actual_vs_predicted.png")
+```
 
 Top 15 predictors by standardized coefficient magnitude:
 
-![](../results/figures/top_15_coefficients.png)
-*Figure 5: Top 15 predictors by standardized coefficient magnitude.*
+```{r top-coefficients}
+#| fig-cap: "Top 15 predictors by standardized coefficient magnitude."
+knitr::include_graphics("../results/figures/top_15_coefficients.png")
+```
 
 ## Result Interpretation
 
-The linear regression model shows weak predictive performance for explaining the number of weeks a song remains at number one on the Billboard chart. Cross-validation produced an average $R^2 = 0.063$ with RMSE = 0.505 and MAE = 0.415, while evaluation on the test set yielded similar results ($R^2 = 0.052$, RMSE = 0.502, MAE = 0.395). The similarity between cross-validation and test metrics suggests that the model generalizes consistently and does not suffer from substantial overfitting. However, the low $R^2$ values indicate that the predictors explain only a small portion of the variation in chart longevity.
+The linear regression model shows weak predictive performance for explaining the number of weeks a song remains at number one on the Billboard chart. Cross-validation produced an average $R^2 = `r round(cv_rsq, 3)`$ with RMSE = `r round(cv_rmse, 3)` and MAE = `r round(cv_mae, 3)`, while evaluation on the test set yielded similar results ($R^2 = `r round(test_rsq, 3)`$, RMSE = `r round(test_rmse, 3)`, MAE = `r round(test_mae, 3)`). The similarity between cross-validation and test metrics suggests that the model generalizes consistently and does not suffer from substantial overfitting. However, the low $R^2$ values indicate that the predictors explain only a small portion of the variation in chart longevity.
 
 The predicted versus actual plot further illustrates this limitation. Predictions tend to cluster around relatively low values regardless of the true outcome, indicating that the model struggles to capture songs that remain at number one for longer periods. Instead, the predictions gravitate toward the average, suggesting the model is unable to identify strong signals that distinguish highly successful songs from others.
 
-Among the predictors, energy has the strongest standardized effect ($\beta = -0.119, p < 0.001$), indicating that lower-energy songs are associated with slightly longer duration at number one. Loudness ($\beta = 0.096, p < 0.001$) and overall rating ($\beta = 0.061, p = 0.003$) show positive and statistically significant relationships with chart longevity, suggesting that songs with stronger perceived production intensity and higher ratings may remain popular for longer periods. Some structural features such as vocal introduction and handclasps/snaps also show modest positive associations, while elements like horns/winds and guitar-based instrumentation show small negative effects.
+Among the predictors, energy has the strongest standardized effect ($\beta = `r round(energy_beta, 3)`$, p < 0.001), indicating that lower-energy songs are associated with slightly longer duration at number one. Loudness ($\beta = `r round(loudness_beta, 3)`$, p < 0.001) and overall rating ($\beta = `r round(rating_beta, 3)`$, p = 0.003) show positive and statistically significant relationships with chart longevity, suggesting that songs with stronger perceived production intensity and higher ratings may remain popular for longer periods. Some structural features such as vocal introduction and handclasps/snaps also show modest positive associations, while elements like horns/winds and guitar-based instrumentation show small negative effects.
 
 However, most predictors are not statistically significant, indicating that these characteristics contribute little predictive signal once audio features are accounted for. Overall, these findings suggest that musical attributes alone are insufficient to explain how long a song remains at number one.
 
 # Discussion
 
-The objective of our analysis was to use a linear regression model to predict the number of weeks a song would remain at the #1 spot of the Billboard Hot 100 song rankings (`weeks_at_number_one`) given open source data. Unnecessary features and features risking data-leakage into the predictive model were removed, and the skewed numerical features were transformed. One-hot encoding was applied on categorical features, including genre and musical key. Following this preprocessing, the linear regression model was trained and the predictions were compared to the ground truth of weeks at the #1 spot. We found that in spite of its limited predictive power, the model generalizes well onto unseen data due to the small difference between training and testing error, and that the top 3 statistically significant features involved in prediction were Energy, Loudness, and overall rating. From the coefficient values, we can conclude that weeks a song remains at the number one position is most associated with lower energy, higher loudness, and higher overall popularity.
+The objective of our analysis was to use a linear regression model to predict the number of weeks a song would remain at the #1 spot of the Billboard Hot 100 song rankings (`weeks_at_number_one`) given open source data. To avoid data leakage, the cleaned dataset was split before feature engineering, and the log transforms, genre encoding, and near-zero variance filtering were learned from the training split only before being applied to the test split. Unnecessary features were then removed using a documented set of domain-driven exclusions. Following this preprocessing, the linear regression model was trained and the predictions were compared to the ground truth of weeks at the #1 spot. We found that in spite of its limited predictive power, the model generalizes well onto unseen data due to the small difference between training and testing error, and that the top 3 statistically significant features involved in prediction were Energy, Loudness, and overall rating. From the coefficient values, we can conclude that weeks a song remains at the number one position is most associated with lower energy, higher loudness, and higher overall popularity.
 
 Previous literature has also investigated song popularity with various models including KNN, linear regression, Random forest (and other tree-based models), and neural networks. Although these models have varying levels of predictive performance, song popularity is documented as a challenge to predict due to the nuanced level of the problem. Factors including individual preferences, globalization of music through various streaming platforms, and global events contribute to the challenge of measuring and influencing song popularity [@ts2023]. Further, global music trends and top performing artists have shifted since the introduction of streaming platforms, and song lengths have decreased to adjust to preferences over time [@kim2021; @ts2023]. Since our analysis spans multiple decades, world events, and the adjustment of streaming platforms, these external factors could be influencing our $R^2$ value and error metrics. This means that songs with popular characteristic features leading to a high number of weeks at the top position from the 1950’s or 60’s, may not generalize well to features from popular songs in the 21st century. Therefore, the low predictive power of our model was expected.
 
