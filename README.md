@@ -47,13 +47,13 @@ dsci-310-group-17/
 2. Start the container using the pinned image tag:
 
    ```bash
-   IMAGE_TAG=sha-307ddb7 docker compose up
+   IMAGE_TAG=sha-2d222e4 docker compose up
    ```
 
    This:
-   - Uses image `ruk2712/dsci-310-group-17:sha-307ddb7` (pinned to this project's latest release)
-   - Maps port **8787** on your machine to RStudio Server inside the container
-   - Mounts the current directory into `/home/rstudio/project` inside the container
+   - Uses image `ruk2712/dsci-310-group-17:sha-2d222e4` (pinned to this project's latest release)
+   - Maps port **8888** on your machine to Jupyter inside the container
+   - Mounts the current directory into `/project` inside the container
 
    > **Alternative tags:** All available image tags (including newer releases) are listed on [Docker Hub](https://hub.docker.com/r/ruk2712/dsci-310-group-17/tags). To use a different version, replace `sha-307ddb7` with any tag from that page, e.g.:
    > ```bash
@@ -61,12 +61,11 @@ dsci-310-group-17/
    > ```
    > You can also omit `IMAGE_TAG` entirely to use `latest`, though this may not be reproducible.
 
-3. Open <http://localhost:8787> in your browser (no password required) to access RStudio Server.
+3. Open <http://localhost:8888> in your browser (no token required) to access Jupyter.
 
-4. In the RStudio **Terminal** tab, run the full analysis pipeline using the Makefile:
+4. In the Jupyter **Terminal** (New → Terminal), run the full analysis pipeline using the Makefile:
 
    ```bash
-   cd project
    make all
    ```
 
@@ -85,7 +84,7 @@ dsci-310-group-17/
    make notebooks/billboard_number_one_prediction.pdf
    ```
 
-   > **Note:** The report is a Quarto document (`.qmd`). Do not use the RStudio Knit button — use the Makefile commands above instead.
+   > **Note:** The report is a Quarto document (`.qmd`). Use the Makefile commands above to render it — do not use the Jupyter notebook run button for this step. The interactive notebook version is `notebooks/billboard_number_one_prediction.ipynb`.
 
 5. To remove all generated files and start fresh:
 

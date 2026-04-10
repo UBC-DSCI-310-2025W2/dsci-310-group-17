@@ -1,6 +1,6 @@
-FROM rocker/rstudio:4.5.2
+FROM rocker/r-ver:4.5.2
 
-ENV RENV_PATHS_LIBRARY=/home/rstudio/renv-library \
+ENV RENV_PATHS_LIBRARY=/project/renv-library \
     RENV_CONFIG_CACHE_ENABLED=FALSE
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -19,9 +19,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     texlive-xetex \
     texlive-fonts-recommended \
     texlive-plain-generic \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /home/rstudio/project
+RUN pip3 install --no-cache-dir jupyter
+
+WORKDIR /project
 
 COPY renv.lock .Rprofile ./
 COPY renv/activate.R renv/activate.R
@@ -29,7 +32,12 @@ COPY renv/activate.R renv/activate.R
 RUN Rscript -e "install.packages('renv', repos = 'https://packagemanager.posit.co/cran/2026-03-28')" && \
     Rscript -e "options(repos = c(CRAN = 'https://packagemanager.posit.co/cran/__linux__/jammy/2026-03-28')); renv::restore()"
 
+RUN Rscript -e "install.packages('IRkernel', repos = 'https://packagemanager.posit.co/cran/2026-03-28')" && \
+    Rscript -e "IRkernel::installspec(user = FALSE)"
+
 COPY . .
 
-RUN chown -R rstudio:rstudio /home/rstudio/project && \
-    chown -R rstudio:rstudio /home/rstudio/renv-library
+EXPOSE 8888
+
+CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", \
+     "--NotebookApp.token=", "--NotebookApp.password="]

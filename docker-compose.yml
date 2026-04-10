@@ -1,11 +1,10 @@
 services:
-  rstudio:
+  jupyter:
     image: ruk2712/dsci-310-group-17:${IMAGE_TAG:-latest}
     ports:
-      - '8787:8787'
+      - '8888:8888'
     environment:
-      - DISABLE_AUTH=true
-      - RENV_PATHS_LIBRARY=/home/rstudio/renv-library
+      - RENV_PATHS_LIBRARY=/project/renv-library
       - RENV_CONFIG_CACHE_ENABLED=FALSE
     volumes:
-      - .:/home/rstudio/project
+      - .:/project:cached
