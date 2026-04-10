@@ -2,6 +2,10 @@
 
 We welcome all contributions to this project!
 
+## Getting Help
+
+For general usage questions, please [open a GitHub Issue](https://github.com/UBC-DSCI-310-2025W2/dsci-310-group-17/issues) and label it as a question.
+
 If you notice a bug or have a feature request, please [open an issue](https://github.com/UBC-DSCI-310-2025W2/dsci-310-group-17/issues).
 
 If you'd like to contribute a feature or bug fix:

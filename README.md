@@ -13,6 +13,22 @@ This project asks the predictive question: Can we predict how many weeks a song 
 
 We use a publicly available Billboard Hot 100 dataset (TidyTuesday, 1958–2025) combined with song-level audio and metadata features to build a regression model that predicts the number of weeks a song remains at the top of the charts (using a log1p transformation to address the strong right-skew in weeks-at-#1). Our linear regression model demonstrates weak predictive performance on unseen data (test RMSE ≈ 0.50 on the log scale; test R² ≈ 0.05), suggesting that the included musical and lyrical-topic features explain only a small portion of the variation in #1 longevity. At a high level, this implies that many drivers of long #1 runs likely depend on factors not captured in the dataset—such as marketing and promotion, artist popularity, streaming/radio dynamics, release timing, and competition in a given week. Despite limited predictive accuracy, the model highlights a few consistent associations with longer #1 runs, including lower energy, higher loudness, and higher overall rating.
 
+## Repository Structure
+
+```
+dsci-310-group-17/
+├── data/
+│   ├── raw/          # Original downloaded data
+│   └── processed/    # Cleaned dataset
+├── scripts/          # R scripts for pipeline
+├── notebooks/        # Quarto report and rendered HTML/PDF output
+├── R/                # Reusable R functions
+├── tests/            # testthat unit tests for functions in R/
+├── Makefile          # Orchestrates the full analysis pipeline
+├── Dockerfile        # Defines the reproducible compute environment
+└── renv.lock         # Pinned R package versions
+```
+
 ## How to Run the Analysis
 
 ### Prerequisites
@@ -39,7 +55,7 @@ We use a publicly available Billboard Hot 100 dataset (TidyTuesday, 1958–2025)
    - Maps port **8787** on your machine to RStudio Server inside the container
    - Mounts the current directory into `/home/rstudio/project` inside the container
 
-   > **Alternative tags:** All available image tags (including newer releases) are listed on [Docker Hub](https://hub.docker.com/r/ruk2712/dsci-310-group-17/tags). To use a different version, replace `sha-13c80a2` with any tag from that page, e.g.:
+   > **Alternative tags:** All available image tags (including newer releases) are listed on [Docker Hub](https://hub.docker.com/r/ruk2712/dsci-310-group-17/tags). To use a different version, replace `sha-307ddb7` with any tag from that page, e.g.:
    > ```bash
    > IMAGE_TAG=sha-6d85eab docker compose up
    > ```
@@ -152,23 +168,27 @@ This project uses R 4.5.2 and manages package dependencies with `renv`. All pack
 
 Key dependencies include:
 
-| Package     | Version      |
-|-------------|--------------|
-| R           | 4.5.2        |
-| tidyverse   | 2.0.0        |
-| ggplot2     | 4.0.2        |
-| dplyr       | 1.2.0        |
-| readr       | 2.2.0        |
-| knitr       | 1.51         |
-| caret       | 7.0-1        |
-| broom       | 1.0.12       |
-| tidymodels  | 1.4.1        |
-| tibble      | 3.3.1        |
-| docopt      | 0.7.2        |
-| testthat    | 3.3.2        |
-| here        | 1.0.2        |
+| Package     | Version | Purpose                                              |
+|-------------|---------|------------------------------------------------------|
+| R           | 4.5.2   | Core language runtime                                |
+| tidyverse   | 2.0.0   | Data wrangling and visualization meta-package        |
+| ggplot2     | 4.0.2   | Data visualization (EDA and result plots)            |
+| dplyr       | 1.2.0   | Data manipulation and filtering                      |
+| readr       | 2.2.0   | Reading CSV files                                    |
+| knitr       | 1.51    | Rendering tables in the Quarto report                |
+| caret       | 7.0-1   | Model training utilities                             |
+| broom       | 1.0.12  | Tidying model outputs (coefficients, metrics)        |
+| tidymodels  | 1.4.1   | Modelling workflow (splitting, cross-validation, OLS)|
+| tibble      | 3.3.1   | Modern data frames                                   |
+| docopt      | 0.7.2   | Command-line argument parsing for scripts            |
+| testthat    | 3.3.2   | Unit testing framework                               |
+| here        | 1.0.2   | Portable file path construction                      |
 
 For the complete list of all pinned dependencies, see `renv.lock`.
+
+## Getting Help
+
+For usage questions or general inquiries, please [open a GitHub Issue](https://github.com/UBC-DSCI-310-2025W2/dsci-310-group-17/issues). See [CONTRIBUTING.md](CONTRIBUTING.md) for details on reporting bugs and submitting pull requests.
 
 ## Licenses
 
