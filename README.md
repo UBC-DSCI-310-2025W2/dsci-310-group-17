@@ -45,11 +45,11 @@ dsci-310-group-17/
 2. Start the container using the pinned image tag:
 
    ```bash
-   IMAGE_TAG=sha-29923c8 docker compose up
+   IMAGE_TAG=sha-1cc272f docker compose up
    ```
 
    This:
-   - Uses image `ruk2712/dsci-310-group-17:sha-07d1cfe` (pinned to this project's latest release)
+   - Uses image `ruk2712/dsci-310-group-17:sha-1cc272f` (pinned to this project's latest release)
    - Maps port **8888** on your machine to Jupyter inside the container
    - Mounts the current directory into `/project` inside the container
 
