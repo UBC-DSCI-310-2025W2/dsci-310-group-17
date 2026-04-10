@@ -15,7 +15,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zlib1g-dev \
     libzmq3-dev \
     python3-pip \
+    wget \
+    gdebi-core \
     && rm -rf /var/lib/apt/lists/*
+
+RUN ARCH=$(dpkg --print-architecture) && \
+    wget -qO /tmp/quarto.deb "https://github.com/quarto-dev/quarto-cli/releases/download/v1.6.43/quarto-1.6.43-linux-${ARCH}.deb" && \
+    gdebi --non-interactive /tmp/quarto.deb && \
+    rm /tmp/quarto.deb
 
 RUN pip3 install --no-cache-dir jupyter --break-system-packages
 
