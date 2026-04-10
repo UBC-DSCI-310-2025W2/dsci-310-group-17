@@ -1,45 +1,47 @@
-FROM rocker/r-ver:4.5.2
+ARG TARGETPLATFORM=linux/amd64
+FROM --platform=$TARGETPLATFORM rocker/r-ver:4.4.2
+WORKDIR /project
 
-ENV RENV_PATHS_LIBRARY=/project/renv-library \
-    RENV_CONFIG_CACHE_ENABLED=FALSE
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# System dependencies
+RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
     libxml2-dev \
-    libfontconfig1-dev \
-    libfreetype6-dev \
-    libharfbuzz-dev \
-    libfribidi-dev \
-    libpng-dev \
-    libtiff-dev \
-    libjpeg-dev \
-    libwebp-dev \
-    zlib1g-dev \
+    libgit2-dev \
+    libglpk-dev \
     libzmq3-dev \
-    texlive-xetex \
-    texlive-fonts-recommended \
-    texlive-plain-generic \
+    build-essential \
+    wget \
+    git \
     python3-pip \
+    pandoc \
+    cmake \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --no-cache-dir jupyter --break-system-packages
+# Install Jupyter
+RUN pip3 install jupyterlab==4.3.4 --break-system-packages
 
-# Install IRkernel before renv::restore() so renv does not intercept it
-RUN R -e "install.packages(c('IRkernel'), repos = 'https://cloud.r-project.org')" && \
-    R -e "IRkernel::installspec(user = FALSE)"
+# Install Quarto
+RUN wget https://github.com/quarto-dev/quarto-cli/releases/download/v1.9.36/quarto-1.9.36-linux-amd64.deb \
+    && dpkg -i quarto-1.9.36-linux-amd64.deb \
+    && rm quarto-1.9.36-linux-amd64.deb
 
-WORKDIR /project
+# Install TinyTeX for PDF rendering
+RUN quarto install tinytex --no-prompt
 
-COPY renv.lock .Rprofile ./
-COPY renv/activate.R renv/activate.R
+# Install R packages and register IRkernel
+# knitr and rmarkdown are required by Quarto to render .qmd files
+RUN R -e "install.packages(c('renv', 'IRkernel', 'knitr', 'rmarkdown'), repos='https://cloud.r-project.org'); IRkernel::installspec(user=FALSE)"
 
-RUN Rscript -e "install.packages('renv', repos = 'https://packagemanager.posit.co/cran/2026-03-28')" && \
-    Rscript -e "options(repos = c(CRAN = 'https://packagemanager.posit.co/cran/__linux__/jammy/2026-03-28')); renv::restore()"
+# Copy renv lockfile and restore packages
+COPY renv.lock .
+COPY renv/ renv/
+COPY .Rprofile* .
+RUN R -e "renv::restore(prompt=FALSE)"
 
-COPY . .
+COPY notebooks/analysis_movie-revenue.ipynb /project/notebooks/
+COPY data/ /project/data/
 
 EXPOSE 8888
-
-CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", \
-     "--NotebookApp.token=", "--NotebookApp.password="]
+CMD ["jupyter", "lab", "--ip=0.0.0.0", "--no-browser", "--allow-root", "--NotebookApp.token=", "--NotebookApp.password="]
