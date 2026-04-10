@@ -4,7 +4,7 @@ services:
     ports:
       - '8888:8888'
     environment:
-      - RENV_PATHS_LIBRARY=/project/renv-library
+      - RENV_PATHS_LIBRARY=/renv-library
       - RENV_CONFIG_CACHE_ENABLED=FALSE
     volumes:
       - .:/project:cached

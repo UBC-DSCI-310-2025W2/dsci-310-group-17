@@ -47,7 +47,7 @@ dsci-310-group-17/
 2. Start the container using the pinned image tag:
 
    ```bash
-   IMAGE_TAG=sha-07d1cfe docker compose up
+   IMAGE_TAG=sha-7fbd7d7 docker compose up
    ```
 
    This:

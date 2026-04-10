@@ -22,6 +22,9 @@ RUN pip3 install --no-cache-dir jupyter --break-system-packages
 RUN R -e "install.packages('IRkernel', repos = 'https://cloud.r-project.org')" && \
     R -e "IRkernel::installspec(user = FALSE)"
 
+ENV RENV_PATHS_LIBRARY=/renv-library
+ENV RENV_CONFIG_CACHE_ENABLED=FALSE
+
 WORKDIR /project
 
 COPY renv.lock .Rprofile ./
