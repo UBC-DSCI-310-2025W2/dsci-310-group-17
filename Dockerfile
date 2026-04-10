@@ -40,7 +40,7 @@ COPY renv/ renv/
 COPY .Rprofile* .
 RUN R -e "renv::restore(prompt=FALSE)"
 
-COPY notebooks/analysis_movie-revenue.ipynb /project/notebooks/
+COPY notebooks/billboard_number_one_prediction.ipynb /project/notebooks/
 COPY data/ /project/data/
 
 EXPOSE 8888
