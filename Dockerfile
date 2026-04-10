@@ -17,6 +17,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-pip \
     wget \
     gdebi-core \
+    texlive-xetex \
+    texlive-fonts-recommended \
+    texlive-plain-generic \
     && rm -rf /var/lib/apt/lists/*
 
 RUN ARCH=$(dpkg --print-architecture) && \
