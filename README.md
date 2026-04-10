@@ -22,8 +22,6 @@ dsci-310-group-17/
 │   └── processed/    # Cleaned dataset
 ├── scripts/          # R scripts for pipeline
 ├── notebooks/        # Quarto report and rendered HTML/PDF output
-├── R/                # Reusable R functions
-├── tests/            # testthat unit tests for functions in R/
 ├── Makefile          # Orchestrates the full analysis pipeline
 ├── Dockerfile        # Defines the reproducible compute environment
 └── renv.lock         # Pinned R package versions
@@ -47,7 +45,7 @@ dsci-310-group-17/
 2. Start the container using the pinned image tag:
 
    ```bash
-   IMAGE_TAG=sha-aeead7b docker compose up
+   IMAGE_TAG=sha-29923c8 docker compose up
    ```
 
    This:
@@ -140,26 +138,7 @@ This project uses `renv` to manage R package dependencies and Docker to ensure a
 
 ## Running the Tests
 
-Tests are written with [`testthat`](https://testthat.r-lib.org/) and cover the four core utility functions in `R/`:
-
-| Test file | Functions tested |
-|-----------|-----------------|
-| `tests/testthat/test-eda_utils.R` | `compute_summary_stats` |
-| `tests/testthat/test-extract_top_coefficients.R` | `extract_top_coefficients()` |
-| `tests/testthat/test-load_data.R` | `load_data()` |
-| `tests/testthat/test-preprocess_utils.R` | `clean_and_join_billboard()` |
-
-To run all tests, open the RStudio **Terminal** inside the running container and execute:
-
-```bash
-Rscript -e "testthat::test_dir('tests/testthat')"
-```
-
-Or run a single test file:
-
-```bash
-Rscript -e "testthat::test_file('tests/testthat/test-load_data.R')"
-```
+Tests for the core utility functions are maintained in the [`dsci310billboardanalysis`](https://github.com/UBC-DSCI-310-2025W2/dsci310billboardanalysis) package repository. See that repository for instructions on running the tests.
 
 ## Dependencies
 
@@ -180,8 +159,8 @@ Key dependencies include:
 | tidymodels  | 1.4.1   | Modelling workflow (splitting, cross-validation, OLS)|
 | tibble      | 3.3.1   | Modern data frames                                   |
 | docopt      | 0.7.2   | Command-line argument parsing for scripts            |
-| testthat    | 3.3.2   | Unit testing framework                               |
 | here        | 1.0.2   | Portable file path construction                      |
+| dsci310billboardanalysis | 0.1.0 | Project utility functions (data loading, preprocessing, EDA, model coefficients) |
 
 For the complete list of all pinned dependencies, see `renv.lock`.
 

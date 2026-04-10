@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gdebi-core \
     texlive-xetex \
     texlive-fonts-recommended \
+    texlive-fonts-extra \
     texlive-plain-generic \
     && rm -rf /var/lib/apt/lists/*
 

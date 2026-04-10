@@ -1591,6 +1591,27 @@
       "Maintainer": "Hadley Wickham <hadley@posit.co>",
       "Repository": "CRAN"
     },
+    "dsci310billboardanalysis": {
+      "Package": "dsci310billboardanalysis",
+      "Version": "0.1.0",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "dsci310billboardanalysis",
+      "RemoteUsername": "UBC-DSCI-310-2025W2",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "22e8f033d03b8ef60e7995d74f5b5d5f4187bc77",
+      "Requirements": [
+        "broom",
+        "caret",
+        "dplyr",
+        "readr",
+        "stats",
+        "stringr",
+        "tibble",
+        "tidyr"
+      ]
+    },
     "dtplyr": {
       "Package": "dtplyr",
       "Version": "1.3.3",
