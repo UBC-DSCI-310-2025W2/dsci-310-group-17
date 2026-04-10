@@ -16,6 +16,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libjpeg-dev \
     libwebp-dev \
     zlib1g-dev \
+    texlive-xetex \
+    texlive-fonts-recommended \
+    texlive-plain-generic \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /home/rstudio/project
@@ -25,7 +28,6 @@ COPY renv/activate.R renv/activate.R
 
 RUN Rscript -e "install.packages('renv', repos = 'https://packagemanager.posit.co/cran/2026-03-28')" && \
     Rscript -e "options(repos = c(CRAN = 'https://packagemanager.posit.co/cran/__linux__/jammy/2026-03-28')); renv::restore()"
-RUN Rscript -e "tinytex::install_tinytex()"
 
 COPY . .
 
