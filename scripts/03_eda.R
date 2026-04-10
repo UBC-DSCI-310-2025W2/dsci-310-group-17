@@ -2,7 +2,7 @@ library(docopt)
 library(tidyverse)
 library(readr)
 library(knitr)
-source("R/eda_utils.R")
+library(dsci310billboardanalysis)
 
 doc <- "
 Usage:

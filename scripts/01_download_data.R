@@ -1,6 +1,6 @@
 library(docopt)
 library(readr)
-source("R/load_data.R")
+library(dsci310billboardanalysis)
 
 doc <- "
 Usage:

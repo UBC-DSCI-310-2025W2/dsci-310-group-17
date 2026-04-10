@@ -4,7 +4,7 @@ library(tidymodels)
 library(readr)
 library(here)
 
-source(here::here("R/extract_top_coefficients.R"))
+library(dsci310billboardanalysis)
 
 doc <- "
 Usage:

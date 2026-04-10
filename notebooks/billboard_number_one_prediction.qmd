@@ -7,6 +7,7 @@ format:
     toc: true
     toc-title: "Table of Contents"
     number-sections: true
+    embed-resources: true
 bibliography: references.bib
 execute:
   echo: false
@@ -144,5 +145,3 @@ A specific example of classifier implementation was conducted by Kim in 2021. Th
 Overall, this regression model provides good predictions given the data, historical trends in music forecasting, and questions being investigated; in spite of its weak predictive patterns. It adds to previous literature, by implementing different features and conducting a longitudinal study. The impact of our results can be used to determine how trends in music have changed overtime. Based on our findings, improvements/future research quests can be made through training separate models for the data into the 20th vs the 21st century, or by decade, to improve performance; while retaining longitudinal nature.
 
 # References
-
-All references will be automatically included here from references.bib.

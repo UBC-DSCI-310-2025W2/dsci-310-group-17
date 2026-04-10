@@ -13,6 +13,20 @@ This project asks the predictive question: Can we predict how many weeks a song 
 
 We use a publicly available Billboard Hot 100 dataset (TidyTuesday, 1958–2025) combined with song-level audio and metadata features to build a regression model that predicts the number of weeks a song remains at the top of the charts (using a log1p transformation to address the strong right-skew in weeks-at-#1). Our linear regression model demonstrates weak predictive performance on unseen data (test RMSE ≈ 0.50 on the log scale; test R² ≈ 0.05), suggesting that the included musical and lyrical-topic features explain only a small portion of the variation in #1 longevity. At a high level, this implies that many drivers of long #1 runs likely depend on factors not captured in the dataset—such as marketing and promotion, artist popularity, streaming/radio dynamics, release timing, and competition in a given week. Despite limited predictive accuracy, the model highlights a few consistent associations with longer #1 runs, including lower energy, higher loudness, and higher overall rating.
 
+## Repository Structure
+
+```
+dsci-310-group-17/
+├── data/
+│   ├── raw/          # Original downloaded data
+│   └── processed/    # Cleaned dataset
+├── scripts/          # R scripts for pipeline
+├── notebooks/        # Quarto report and rendered HTML/PDF output
+├── Makefile          # Orchestrates the full analysis pipeline
+├── Dockerfile        # Defines the reproducible compute environment
+└── renv.lock         # Pinned R package versions
+```
+
 ## How to Run the Analysis
 
 ### Prerequisites
@@ -31,26 +45,25 @@ We use a publicly available Billboard Hot 100 dataset (TidyTuesday, 1958–2025)
 2. Start the container using the pinned image tag:
 
    ```bash
-   IMAGE_TAG=sha-307ddb7 docker compose up
+   IMAGE_TAG=sha-c4c10c1 docker compose up
    ```
 
    This:
-   - Uses image `ruk2712/dsci-310-group-17:sha-307ddb7` (pinned to this project's latest release)
-   - Maps port **8787** on your machine to RStudio Server inside the container
-   - Mounts the current directory into `/home/rstudio/project` inside the container
+   - Uses image `ruk2712/dsci-310-group-17:sha-c4c10c1` (pinned to this project's latest release)
+   - Maps port **8888** on your machine to Jupyter inside the container
+   - Mounts the current directory into `/project` inside the container
 
-   > **Alternative tags:** All available image tags (including newer releases) are listed on [Docker Hub](https://hub.docker.com/r/ruk2712/dsci-310-group-17/tags). To use a different version, replace `sha-13c80a2` with any tag from that page, e.g.:
+   > **Alternative tags:** All available image tags (including newer releases) are listed on [Docker Hub](https://hub.docker.com/r/ruk2712/dsci-310-group-17/tags). To use a different version, replace `sha-307ddb7` with any tag from that page, e.g.:
    > ```bash
    > IMAGE_TAG=sha-6d85eab docker compose up
    > ```
    > You can also omit `IMAGE_TAG` entirely to use `latest`, though this may not be reproducible.
 
-3. Open <http://localhost:8787> in your browser (no password required) to access RStudio Server.
+3. Open <http://localhost:8888> in your browser (no token required) to access Jupyter.
 
-4. In the RStudio **Terminal** tab, run the full analysis pipeline using the Makefile:
+4. In the Jupyter **Terminal** (New → Terminal), run the full analysis pipeline using the Makefile:
 
    ```bash
-   cd project
    make all
    ```
 
@@ -69,7 +82,7 @@ We use a publicly available Billboard Hot 100 dataset (TidyTuesday, 1958–2025)
    make notebooks/billboard_number_one_prediction.pdf
    ```
 
-   > **Note:** The report is a Quarto document (`.qmd`). Do not use the RStudio Knit button — use the Makefile commands above instead.
+   > **Note:** The report is a Quarto document (`.qmd`). Use the Makefile commands above to render it — do not use the Jupyter notebook run button for this step. The interactive notebook version is `notebooks/billboard_number_one_prediction.ipynb`.
 
 5. To remove all generated files and start fresh:
 
@@ -125,26 +138,7 @@ This project uses `renv` to manage R package dependencies and Docker to ensure a
 
 ## Running the Tests
 
-Tests are written with [`testthat`](https://testthat.r-lib.org/) and cover the four core utility functions in `R/`:
-
-| Test file | Functions tested |
-|-----------|-----------------|
-| `tests/testthat/test-eda_utils.R` | `compute_summary_stats` |
-| `tests/testthat/test-extract_top_coefficients.R` | `extract_top_coefficients()` |
-| `tests/testthat/test-load_data.R` | `load_data()` |
-| `tests/testthat/test-preprocess_utils.R` | `clean_and_join_billboard()` |
-
-To run all tests, open the RStudio **Terminal** inside the running container and execute:
-
-```bash
-Rscript -e "testthat::test_dir('tests/testthat')"
-```
-
-Or run a single test file:
-
-```bash
-Rscript -e "testthat::test_file('tests/testthat/test-load_data.R')"
-```
+Tests for the core utility functions are maintained in the [`dsci310billboardanalysis`](https://github.com/UBC-DSCI-310-2025W2/dsci310billboardanalysis) package repository. See that repository for instructions on running the tests.
 
 ## Dependencies
 
@@ -152,23 +146,27 @@ This project uses R 4.5.2 and manages package dependencies with `renv`. All pack
 
 Key dependencies include:
 
-| Package     | Version      |
-|-------------|--------------|
-| R           | 4.5.2        |
-| tidyverse   | 2.0.0        |
-| ggplot2     | 4.0.2        |
-| dplyr       | 1.2.0        |
-| readr       | 2.2.0        |
-| knitr       | 1.51         |
-| caret       | 7.0-1        |
-| broom       | 1.0.12       |
-| tidymodels  | 1.4.1        |
-| tibble      | 3.3.1        |
-| docopt      | 0.7.2        |
-| testthat    | 3.3.2        |
-| here        | 1.0.2        |
+| Package     | Version | Purpose                                              |
+|-------------|---------|------------------------------------------------------|
+| R           | 4.5.2   | Core language runtime                                |
+| tidyverse   | 2.0.0   | Data wrangling and visualization meta-package        |
+| ggplot2     | 4.0.2   | Data visualization (EDA and result plots)            |
+| dplyr       | 1.2.0   | Data manipulation and filtering                      |
+| readr       | 2.2.0   | Reading CSV files                                    |
+| knitr       | 1.51    | Rendering tables in the Quarto report                |
+| caret       | 7.0-1   | Model training utilities                             |
+| broom       | 1.0.12  | Tidying model outputs (coefficients, metrics)        |
+| tidymodels  | 1.4.1   | Modelling workflow (splitting, cross-validation, OLS)|
+| tibble      | 3.3.1   | Modern data frames                                   |
+| docopt      | 0.7.2   | Command-line argument parsing for scripts            |
+| here        | 1.0.2   | Portable file path construction                      |
+| dsci310billboardanalysis | 0.1.0 | Project utility functions (data loading, preprocessing, EDA, model coefficients) |
 
 For the complete list of all pinned dependencies, see `renv.lock`.
+
+## Getting Help
+
+For usage questions or general inquiries, please [open a GitHub Issue](https://github.com/UBC-DSCI-310-2025W2/dsci-310-group-17/issues). See [CONTRIBUTING.md](CONTRIBUTING.md) for details on reporting bugs and submitting pull requests.
 
 ## Licenses
 

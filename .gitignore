@@ -51,6 +51,9 @@ rsconnect/
 # MacOS system file
 .DS_Store
 
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
 # Generated report outputs
 notebooks/*.html
 notebooks/*.pdf
