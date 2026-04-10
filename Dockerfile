@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 rocker/rstudio:4.5.2
+FROM rocker/rstudio:4.5.2
 
 ENV RENV_PATHS_LIBRARY=/home/rstudio/renv-library \
     RENV_CONFIG_CACHE_ENABLED=FALSE
