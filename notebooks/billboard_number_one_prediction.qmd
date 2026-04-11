@@ -85,18 +85,30 @@ knitr::include_graphics("../results/figures/average_week.png")
 ```
 
 ## Feature Transformations & Selection
-
-- Log transformation applied to right-skewed variables (`weeks_at_number_one`, `acousticness`).
-- One-hot encoding for multi-label genres.
+- Performed a train/test split (70/30) prior to preprocessing to prevent data leakage.
+- Applied log transformation applied to right-skewed variables (`weeks_at_number_one`, `acousticness`).
 - Collapsed musical keys into Major, Minor, and Multiple Keys.
-- Dropped redundant, high-cardinality, and ambiguous columns after the train/test split, using domain knowledge to remove identifiers, duplicate metadata, sparse content indicators, and weakly interpretable variables.
-- Removed near-zero variance predictors using the training split only, then applied the same exclusion set to the test split.
+- One-hot encoded multi-label genre data using genre levels learned from the training set to ensure consistency.
+- Removed predefined columns based on domain knowledge, including identifiers, redundant metadata, sparse external-content indicators, and variables with limited interpretability.
+- Eliminated near-zero variance predictors using only the training data, then applied the same feature exclusions to the test set.
 
 ## Modeling
+We bult a linear regression model to predict the log-transformed number of weeks at #1 (`log_weeks_at_number_one`) using a `tidymodels` workflow. The modeling pipelien included:
 
-- Data split into training (70%) and testing (30%) sets.
-- Linear regression model built using tidymodels workflow.
-- Model evaluated with repeated 5-fold cross-validation and on the test set.
+### Data Preprocessing Recipe:
+- Dummy encoding of all nominal predictors.
+- Removal of near-zero variance predictors.
+- Normalization of all numeric predictors to ensure standardized coefficients.
+- Removal of linearly dependent predictors to prevent multicollinearity.
+
+### Model Specification:
+- Ordinary least squares (OLS) linear regression.
+- Engine: `lm`.
+
+### Model Evaluation:
+- **Cross validation:** 5-fold cross-validation with 3 repeats on the training set (70% of data), stratified by the target variable.
+- **Test set evaluation:** Final model fitted on the entire training set and evaluated on the held-out test set (30% of data).
+- **Metrics**: Root Mean Squared Error (RMSE), R-squared ($R^2$), and Mean Absolute Error (MAE).
 
 ## Results
 
@@ -125,14 +137,48 @@ knitr::include_graphics("../results/figures/top_15_coefficients.png")
 ```
 
 ## Result Interpretation
+### Model Performance:
 
-The linear regression model shows weak predictive performance for explaining the number of weeks a song remains at number one on the Billboard chart. Cross-validation produced an average $R^2 = `r round(cv_rsq, 3)`$ with RMSE = `r round(cv_rmse, 3)` and MAE = `r round(cv_mae, 3)`, while evaluation on the test set yielded similar results ($R^2 = `r round(test_rsq, 3)`$, RMSE = `r round(test_rmse, 3)`, MAE = `r round(test_mae, 3)`). The similarity between cross-validation and test metrics suggests that the model generalizes consistently and does not suffer from substantial overfitting. However, the low $R^2$ values indicate that the predictors explain only a small portion of the variation in chart longevity.
+**Cross-validation Results:**  
+Our 5-fold repeated cross-validation (3 repeats) on the training set yielded the following metrics:
 
-The predicted versus actual plot further illustrates this limitation. Predictions tend to cluster around relatively low values regardless of the true outcome, indicating that the model struggles to capture songs that remain at number one for longer periods. Instead, the predictions gravitate toward the average, suggesting the model is unable to identify strong signals that distinguish highly successful songs from others.
+- **RMSE:** 0.506 (standard error = 0.005)
+- **$R^2$:** 0.066 (standard error = 0.009)
+- **MAE:** 0.417 (standard error = 0.005)
 
-Among the predictors, energy has the strongest standardized effect ($\beta = `r round(energy_beta, 3)`$, p < 0.001), indicating that lower-energy songs are associated with slightly longer duration at number one. Loudness ($\beta = `r round(loudness_beta, 3)`$, p < 0.001) and overall rating ($\beta = `r round(rating_beta, 3)`$, p = 0.003) show positive and statistically significant relationships with chart longevity, suggesting that songs with stronger perceived production intensity and higher ratings may remain popular for longer periods. Some structural features such as vocal introduction and handclasps/snaps also show modest positive associations, while elements like horns/winds and guitar-based instrumentation show small negative effects.
+**Test Set Results:**  
+Evaluation on the held-out test set produced:
 
-However, most predictors are not statistically significant, indicating that these characteristics contribute little predictive signal once audio features are accounted for. Overall, these findings suggest that musical attributes alone are insufficient to explain how long a song remains at number one.
+- **RMSE:** 0.508
+- **$R^2$:** 0.032
+- **MAE:** 0.4
+
+### Interpretation:
+The model demonstrates weak predictive performance overall. The test set $R^2$ of $0.032$ indicates that our linear regression model explains only approximately $3.2 \%$ of the variance in the log-transformed weeks at #1. The cross-validation $R^2$ of 0.066 is slightly higher but still indicates poor explanatory power.
+
+**Table: Actual vs predicted weeks at number one on the test set (original scale).** visualizes the model's predictions on the test set after back-transforming to the original scale (weeks). The scatter plot shows substantial deviation from the ideal diagonal line (dashed red), confirming weak predictive accuracy. Most predictions cluster between 1 and 3 weeks regardless of actual values, suggesting the model struggles to capture the full range of outcomes - particularly for songs that stay at 3 for extended periods. The RMSE of approximately 0.5 on the log scale translates to notable prediction errors when back-transformed. The MAE of 0.4 suggests that on average, our predictions are off by about 0.4 units on the log scale, which compounds when converted to the original week scale for longer-duration songs.
+
+Dispite the overall performance, examining feature importance reveals interesting patterns about which song characteristics influence chart longevity.
+
+**Table: Top 15 predictors by standardized coefficient magnitude.** displays the standardized coefficients of the 15 most influential predictors by magnitude. Importantly, not all of these coefficients are statistically significant, so we must interpret them cautiously.
+
+Statistically significant positive predictors (p$< 0.05$, blue bars):
+
+- Loudness: The strongest significant positive predictor ($\beta = 0.1, p < 0.001$), suggesting louder songs tend to stay at #1 longer.
+- Sample: Songs that incorportae samples show increased longevity ($\beta = 0.094, p = 0.009$).
+- Overall Rating: Higher-rated songs predictably ramin at the top longer ($\beta = 0.057, p = 0.005$).
+- Vocal Introduction: Songs with vocal introductions show modest positive effects ($\beta = 0.051, p = 0.012$).
+- Handclaps/Snaps: Presence f these percussive elements correlates with longevity ($\beta = 0.046, p = 0.017$).
+
+Statistically significant negative predictors (p$< 0.05$, red bars):
+
+- Energy: Counterintuitively, the strongest negative predictor ($\beta = -0.122, p < 0.001$), higehr energy songs spend fewer weeks at #1.
+- Horns/Winds: Presence of brass/wind instruments negatively correlates with chart duration ($\beta = -0.058, p = 0.009$).
+
+These coefficients are standardized (predictors were normalized), making them directly comparable in magnitude. However, given the model's low $R^2$ and the lack of statistical significance for many coefficients, only the seven significant predictors provide reliable evidence of association with chart performance. The remaining features may represent noise or relationships too weak to detect with our sample size.
+
+The significant findings suggest that louder, sample-based songs with vocal introductions, handclaps/snaps, and higher ratings tend to stay at #1 longer, while high-energy songs and those featuring horns/winds tend to have shorter runs. However, these features collectively explain very little variance in chart performance, indicating that unmeasured factors (marketing, cultural timing, artist fame, etc.) likely play dominant roles in determining chart longevity.
+
 
 # Discussion
 
