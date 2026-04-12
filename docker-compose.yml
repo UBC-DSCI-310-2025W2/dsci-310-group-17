@@ -1,5 +1,6 @@
 services:
   jupyter:
+    build: .
     image: ruk2712/dsci-310-group-17:${IMAGE_TAG:-latest}
     ports:
       - '8888:8888'
