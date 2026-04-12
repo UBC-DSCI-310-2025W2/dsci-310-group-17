@@ -30,7 +30,21 @@ RUN R -e "install.packages('tinytex', repos='https://cloud.r-project.org')" && \
     R -e "tinytex::install_tinytex()" && \
     ln -sf /root/.TinyTeX/bin/*/* /usr/local/bin/
 
-RUN R -e "tinytex::tlmgr_install('koma-script')"
+RUN R -e "tinytex::tlmgr_install(c( \
+  'koma-script', 'lm', 'lm-math', \
+  'amsmath', 'amsfonts', 'unicode-math', \
+  'fontspec', 'mathspec', 'iftex', \
+  'xcolor', 'geometry', 'fancyvrb', 'framed', \
+  'booktabs', 'longtable', 'array', 'multirow', \
+  'caption', 'float', \
+  'hyperref', 'bookmark', 'xurl', \
+  'upquote', 'microtype', 'parskip', \
+  'footmisc', 'footnotebackref', 'grffile', \
+  'etoolbox', 'tools', \
+  'selnolig', 'enumitem', \
+  'tcolorbox', 'environ', 'pgf', 'trimspaces', \
+  'natbib', 'setspace', 'csquotes' \
+))"
 
 ENV QUARTO_TINYTEX=/root/.TinyTeX
 
