@@ -63,3 +63,6 @@ notebooks/*_files/
 results/figures/
 results/tables/
 data/processed/
+
+# Makefile stamp file
+.renv-restored

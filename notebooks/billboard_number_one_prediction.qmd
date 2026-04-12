@@ -8,6 +8,9 @@ format:
     toc-title: "Table of Contents"
     number-sections: true
     embed-resources: true
+  pdf:
+    toc: true
+    number-sections: true
 bibliography: references.bib
 execute:
   echo: false

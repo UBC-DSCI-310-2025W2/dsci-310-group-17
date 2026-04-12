@@ -3,7 +3,7 @@
 .PHONY: all clean validate
 
 #Run all command for makefile
-all: notebooks/billboard_number_one_prediction.html
+all: notebooks/billboard_number_one_prediction.html notebooks/billboard_number_one_prediction.pdf
 
 
 #Cleaning the Makefile
@@ -13,11 +13,17 @@ clean:
 	results/figures/*.png \
 	results/tables/*.csv \
 	notebooks/*.html \
-	notebooks/*.pdf
+	notebooks/*.pdf \
+	.renv-restored
+
+#Restore renv packages (no-op if already up to date)
+.renv-restored: renv.lock
+	Rscript -e 'renv::restore()'
+	touch .renv-restored
 
 #Generating data for report
 data/raw/billboard.csv \
-data/raw/topics.csv: scripts/01_download_data.R
+data/raw/topics.csv: .renv-restored scripts/01_download_data.R
 	Rscript scripts/01_download_data.R \
 		--out_billboard=data/raw/billboard.csv \
 		--out_topics=data/raw/topics.csv
@@ -80,7 +86,7 @@ render:
 	quarto render notebooks/billboard_number_one_prediction.qmd
 
 #PDF
-notebooks/billboard_number_one_prediction.pdf: \
+notebooks/billboard_number_one_prediction.pdf: .renv-restored \
 results/tables/summary_stats.csv \
 results/tables/cv_metrics.csv \
 results/tables/test_metrics.csv \
@@ -94,7 +100,7 @@ notebooks/billboard_number_one_prediction.qmd
 	quarto render notebooks/billboard_number_one_prediction.qmd --to pdf
 
 #HTML
-notebooks/billboard_number_one_prediction.html: \
+notebooks/billboard_number_one_prediction.html: .renv-restored \
 results/tables/summary_stats.csv \
 results/tables/cv_metrics.csv \
 results/tables/test_metrics.csv \

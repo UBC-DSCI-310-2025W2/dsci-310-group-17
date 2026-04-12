@@ -17,16 +17,36 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-pip \
     wget \
     gdebi-core \
-    texlive-xetex \
-    texlive-fonts-recommended \
-    texlive-fonts-extra \
-    texlive-plain-generic \
+    xz-utils \
+    perl \
     && rm -rf /var/lib/apt/lists/*
 
 RUN ARCH=$(dpkg --print-architecture) && \
     wget -qO /tmp/quarto.deb "https://github.com/quarto-dev/quarto-cli/releases/download/v1.6.43/quarto-1.6.43-linux-${ARCH}.deb" && \
     gdebi --non-interactive /tmp/quarto.deb && \
     rm /tmp/quarto.deb
+
+RUN R -e "install.packages('tinytex', repos='https://cloud.r-project.org')" && \
+    R -e "tinytex::install_tinytex()" && \
+    ln -sf /root/.TinyTeX/bin/*/* /usr/local/bin/
+
+RUN R -e "tinytex::tlmgr_install(c( \
+  'koma-script', 'lm', 'lm-math', \
+  'amsmath', 'amsfonts', 'unicode-math', \
+  'fontspec', 'mathspec', 'iftex', \
+  'xcolor', 'geometry', 'fancyvrb', 'framed', \
+  'booktabs', 'longtable', 'array', 'multirow', \
+  'caption', 'float', \
+  'hyperref', 'bookmark', 'xurl', \
+  'upquote', 'microtype', 'parskip', \
+  'footmisc', 'footnotebackref', 'grffile', \
+  'etoolbox', 'tools', \
+  'selnolig', 'enumitem', \
+  'tcolorbox', 'environ', 'pgf', 'trimspaces', \
+  'natbib', 'setspace', 'csquotes' \
+))"
+
+ENV QUARTO_TINYTEX=/root/.TinyTeX
 
 RUN pip3 install --no-cache-dir jupyter --break-system-packages
 
@@ -45,6 +65,8 @@ RUN Rscript -e "install.packages('renv', repos = 'https://packagemanager.posit.c
     Rscript -e "options(repos = c(CRAN = 'https://packagemanager.posit.co/cran/__linux__/jammy/2026-03-28')); renv::restore()"
 
 COPY . .
+
+RUN echo 'local({ libs <- Sys.glob("/renv-library/*/*/*"); if (length(libs)) .libPaths(c(libs, .libPaths())) })' > /root/.Rprofile
 
 EXPOSE 8888
 
