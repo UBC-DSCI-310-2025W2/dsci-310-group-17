@@ -90,6 +90,12 @@ knitr::include_graphics("../results/figures/average_week.png")
 - Collapsed musical keys into Major, Minor, and Multiple Keys.
 - One-hot encoded multi-label genre data using genre levels learned from the training set to ensure consistency.
 - Removed predefined columns based on domain knowledge, including identifiers, redundant metadata, sparse external-content indicators, and variables with limited interpretability.
+  - Demographic identity variables (`artist_male`, `artist_female`, `artist_black`, `songwriter_male`, `songwriter_white`, `producer_male`, `producer_white`): Excluded due to ethical concerns about using demographic features in predictive modeling and potential for introducing bias.
+  - Artist structure variables (`artist_structure`, `group_named_after_non_lead_singer`): : Redundant with other artist-related features and limited interpretability
+  - Songwriter/producer overlap indicators (`artist_is_only_songwriter`, `artist_is_only_producer`, `songwriter_is_a_producer`): Highly correlated with the retained feature artist_is_a_songwriter, which captures the key relationship between artist and songwriting
+  - Timing variables (`instrumental_length_sec`, `intro_length_sec`): Redundant with the overall `length_sec` variable and may introduce multicollinearity
+  - Lyrical content variables (`lyrical_topic`, `lyrical_narrative`): High-cardinality categorical variables with sparse levels that would create excessive dummy variables and reduce model interpretability
+  - External content indicators (`written_for_a_play`, `written_for_a_film`, `written_for_a_t_v_show`, `eurovision_entry`, `topped_the_charts_by_multiple_artist`, `associated_with_dance`): Sparse binary variables with very few positive cases, providing minimal signal while increasing model complexity
 - Eliminated near-zero variance predictors using only the training data, then applied the same feature exclusions to the test set.
 
 ## Modeling
