@@ -17,16 +17,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-pip \
     wget \
     gdebi-core \
-    texlive-xetex \
-    texlive-fonts-recommended \
-    texlive-fonts-extra \
-    texlive-plain-generic \
     && rm -rf /var/lib/apt/lists/*
 
 RUN ARCH=$(dpkg --print-architecture) && \
     wget -qO /tmp/quarto.deb "https://github.com/quarto-dev/quarto-cli/releases/download/v1.6.43/quarto-1.6.43-linux-${ARCH}.deb" && \
     gdebi --non-interactive /tmp/quarto.deb && \
     rm /tmp/quarto.deb
+
+RUN quarto install tinytex --no-prompt
 
 RUN pip3 install --no-cache-dir jupyter --break-system-packages
 

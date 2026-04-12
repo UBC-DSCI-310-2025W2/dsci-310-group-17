@@ -53,7 +53,7 @@ dsci-310-group-17/
    - Maps port **8888** on your machine to Jupyter inside the container
    - Mounts the current directory into `/project` inside the container
 
-   > **Alternative tags:** All available image tags (including newer releases) are listed on [Docker Hub](https://hub.docker.com/r/ruk2712/dsci-310-group-17/tags). To use a different version, replace `sha-307ddb7` with any tag from that page, e.g.:
+   > **Alternative tags:** All available image tags (including newer releases) are listed on [Docker Hub](https://hub.docker.com/r/ruk2712/dsci-310-group-17/tags). To use a different version, replace `sha-c4c10c1` with any tag from that page, e.g.:
    > ```bash
    > IMAGE_TAG=sha-6d85eab docker compose up
    > ```
