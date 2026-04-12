@@ -17,6 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-pip \
     wget \
     gdebi-core \
+    xz-utils \
+    perl \
     && rm -rf /var/lib/apt/lists/*
 
 RUN ARCH=$(dpkg --print-architecture) && \
@@ -27,6 +29,8 @@ RUN ARCH=$(dpkg --print-architecture) && \
 RUN R -e "install.packages('tinytex', repos='https://cloud.r-project.org')" && \
     R -e "tinytex::install_tinytex()" && \
     ln -sf /root/.TinyTeX/bin/*/* /usr/local/bin/
+
+RUN R -e "tinytex::tlmgr_install('koma-script')"
 
 ENV QUARTO_TINYTEX=/root/.TinyTeX
 
