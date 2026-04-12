@@ -45,15 +45,15 @@ dsci-310-group-17/
 2. Start the container using the pinned image tag:
 
    ```bash
-   IMAGE_TAG=sha-c4c10c1 docker compose up
+   IMAGE_TAG=sha-505f49a docker compose up
    ```
 
    This:
-   - Uses image `ruk2712/dsci-310-group-17:sha-c4c10c1` (pinned to this project's latest release)
+   - Uses image `ruk2712/dsci-310-group-17:sha-505f49a` (pinned to this project's latest release)
    - Maps port **8888** on your machine to Jupyter inside the container
    - Mounts the current directory into `/project` inside the container
 
-   > **Alternative tags:** All available image tags (including newer releases) are listed on [Docker Hub](https://hub.docker.com/r/ruk2712/dsci-310-group-17/tags). To use a different version, replace `sha-c4c10c1` with any tag from that page, e.g.:
+   > **Alternative tags:** All available image tags (including newer releases) are listed on [Docker Hub](https://hub.docker.com/r/ruk2712/dsci-310-group-17/tags). To use a different version, replace `sha-505f49a` with any tag from that page, e.g.:
    > ```bash
    > IMAGE_TAG=sha-6d85eab docker compose up
    > ```
@@ -61,7 +61,7 @@ dsci-310-group-17/
 
 3. Open <http://localhost:8888> in your browser (no token required) to access Jupyter.
 
-4. In the Jupyter **Terminal** (New → Terminal), run the full analysis pipeline using the Makefile:
+4. In the Jupyter **Terminal** (File → New → Terminal), run the full analysis pipeline using the Makefile:
 
    ```bash
    make all
