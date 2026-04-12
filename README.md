@@ -2,10 +2,10 @@
 
 ## Contributors/Authors
 
-- May Eindra Tet Toe
-- Anastasia Tountas
-- Tran Anh Thu Phung
-- Harry Nguyen
+- May Eindra Tet Toe (University of British Columbia)
+- Anastasia Tountas (University of British Columbia)
+- Tran Anh Thu Phung (University of British Columbia)
+- Harry Nguyen (University of British Columbia)
 
 ## Summary
 
