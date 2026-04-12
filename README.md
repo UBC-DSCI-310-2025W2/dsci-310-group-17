@@ -72,8 +72,9 @@ dsci-310-group-17/
    |------|--------|--------|
    | Download data | `scripts/01_download_data.R` | `data/raw/` |
    | Preprocess data | `scripts/02_preprocess_data.R` | `data/processed/` |
-   | EDA | `scripts/03_eda.R` | `results/figures/`, `results/tables/` |
-   | Model & results | `scripts/04_model_and_results.R` | `results/figures/`, `results/tables/` |
+   | Validation | `scripts/03_validate_data.R` | console checks |
+   | EDA | `scripts/04_eda.R` | `results/figures/`, `results/tables/` |
+   | Model & results | `scripts/05_model_and_results.R` | `results/figures/`, `results/tables/` |
    | Render report (HTML) | `notebooks/billboard_number_one_prediction.qmd` | `notebooks/billboard_number_one_prediction.html` |
 
    To also render the **PDF** version of the report:
