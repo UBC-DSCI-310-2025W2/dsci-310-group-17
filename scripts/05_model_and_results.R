@@ -8,7 +8,7 @@ library(dsci310billboardanalysis)
 
 doc <- "
 Usage:
-  04_model_and_results.R [--in_train=<path>] [--in_test=<path>] [--out_prefix_figures=<prefix>] [--out_prefix_tables=<prefix>]
+  05_model_and_results.R [--in_train=<path>] [--in_test=<path>] [--out_prefix_figures=<prefix>] [--out_prefix_tables=<prefix>]
                         
 Options:
   --in_train=<path> Path to the training CSV [default: ../data/processed/billboard_model_training.csv]

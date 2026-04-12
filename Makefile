@@ -1,6 +1,6 @@
 # DSCI 310 Group Project 17 Milestone 2 Makefile
 
-.PHONY: all clean
+.PHONY: all clean validate
 
 #Run all command for makefile
 all: notebooks/billboard_number_one_prediction.html
@@ -41,12 +41,17 @@ scripts/02_preprocess_data.R
 results:
 	mkdir -p results/figures results/tables
 
+# Data validation checks
+validate: data/processed/billboard_model_eda.csv scripts/03_validate_data.R
+	Rscript scripts/03_validate_data.R \
+		--in_eda=data/processed/billboard_model_eda.csv
+
 #Conducting EDA and generating relevant plots for scripts
 results/tables/summary_stats.csv \
 results/figures/target_distribution.png \
 results/figures/audio_feature_distribution.png \
-results/figures/average_week.png: results data/processed/billboard_model_eda.csv scripts/03_eda.R
-	Rscript scripts/03_eda.R \
+results/figures/average_week.png: results data/processed/billboard_model_eda.csv validate scripts/04_eda.R
+	Rscript scripts/04_eda.R \
 		--in_data=data/processed/billboard_model_eda.csv \
 		--out_prefix_tables=results/tables/ \
 		--out_prefix_figures=results/figures/
@@ -60,8 +65,8 @@ results/figures/top_15_coefficients.png: \
 results \
 data/processed/billboard_model_training.csv \
 data/processed/billboard_model_testing.csv \
-scripts/04_model_and_results.R
-	Rscript scripts/04_model_and_results.R \
+scripts/05_model_and_results.R
+	Rscript scripts/05_model_and_results.R \
 		--in_train=data/processed/billboard_model_training.csv \
 		--in_test=data/processed/billboard_model_testing.csv \
 		--out_prefix_tables=results/tables/ \

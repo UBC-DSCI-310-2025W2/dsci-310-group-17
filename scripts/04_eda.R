@@ -6,7 +6,7 @@ library(dsci310billboardanalysis)
 
 doc <- "
 Usage:
-  03_eda.R [--in_data=<path>] [--out_prefix_tables=<prefix>] [--out_prefix_figures=<prefix>]
+  04_eda.R [--in_data=<path>] [--out_prefix_tables=<prefix>] [--out_prefix_figures=<prefix>]
   
 Options:
   --in_data=<path> Path to the processed EDA dataset [default: ../data/processed/billboard_model_eda.csv] 
