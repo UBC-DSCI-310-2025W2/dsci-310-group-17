@@ -24,7 +24,9 @@ RUN ARCH=$(dpkg --print-architecture) && \
     gdebi --non-interactive /tmp/quarto.deb && \
     rm /tmp/quarto.deb
 
-RUN quarto install tinytex --no-prompt
+RUN R -e "install.packages('tinytex', repos='https://cloud.r-project.org')" && \
+    R -e "tinytex::install_tinytex()" && \
+    ln -sf /root/.TinyTeX/bin/*/* /usr/local/bin/
 
 RUN pip3 install --no-cache-dir jupyter --break-system-packages
 
@@ -44,7 +46,7 @@ RUN Rscript -e "install.packages('renv', repos = 'https://packagemanager.posit.c
 
 COPY . .
 
-RUN echo 'source("/project/renv/activate.R")' > /root/.Rprofile
+RUN echo 'local({ libs <- Sys.glob("/renv-library/*/*/*"); if (length(libs)) .libPaths(c(libs, .libPaths())) })' > /root/.Rprofile
 
 EXPOSE 8888
 
