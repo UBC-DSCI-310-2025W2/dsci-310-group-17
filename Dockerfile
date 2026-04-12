@@ -28,6 +28,8 @@ RUN R -e "install.packages('tinytex', repos='https://cloud.r-project.org')" && \
     R -e "tinytex::install_tinytex()" && \
     ln -sf /root/.TinyTeX/bin/*/* /usr/local/bin/
 
+ENV QUARTO_TINYTEX=/root/.TinyTeX
+
 RUN pip3 install --no-cache-dir jupyter --break-system-packages
 
 RUN R -e "install.packages('IRkernel', repos = 'https://cloud.r-project.org')" && \
