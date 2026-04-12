@@ -2,7 +2,7 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ "main" , "render-pdf"]
+    branches: [ "main" ]
     paths:
       - "Dockerfile"
       - "renv.lock"
