@@ -44,6 +44,8 @@ RUN Rscript -e "install.packages('renv', repos = 'https://packagemanager.posit.c
 
 COPY . .
 
+RUN echo 'source("/project/renv/activate.R")' > /root/.Rprofile
+
 EXPOSE 8888
 
 CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", \
